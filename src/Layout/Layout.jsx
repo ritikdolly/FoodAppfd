@@ -5,11 +5,16 @@ import { Outlet } from 'react-router-dom'
 
 export const Layout = () => {
   return (
-    <>
-        <Header/>
-        <div>Layout</div>
-        <Outlet/>
-        <Footer/>
-    </>
-  )
-}
+    <div className="flex flex-col min-h-screen">
+      <Header />
+
+      {/* IMPORTANT: push content below fixed header */}
+      <main className="pt-20 flex-1">
+        <Outlet />
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
