@@ -1,12 +1,14 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import { Layout } from './Layout/Layout'
-import { DashBoard } from './components/admin/DashBoard'
+import { DashBoard } from './components/admin/dashboard/DashBoard'
+import { Home } from './components/user/home/Home'
 
 const router=createBrowserRouter([
   {path:'/',element:<Layout/>,
     children:[
-      {index:true,element:<DashBoard/>}
+      // {index:true,element:<DashBoard/>},
+      {index:true,element:<Home/>}
     ]
   }
 ])
