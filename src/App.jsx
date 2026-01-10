@@ -3,12 +3,14 @@ import './App.css'
 import { Layout } from './Layout/Layout'
 import { DashBoard } from './components/admin/dashboard/DashBoard'
 import { Home } from './components/user/home/Home'
+import { ProductPage } from '../src/pages/ProductPage'
 
 const router=createBrowserRouter([
   {path:'/',element:<Layout/>,
     children:[
       // {index:true,element:<DashBoard/>},
-      {index:true,element:<Home/>}
+      {index:true,element:<Home/>},
+      {path:'/product/:id',element:<ProductPage/>}
     ]
   }
 ])

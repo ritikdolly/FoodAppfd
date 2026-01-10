@@ -9,7 +9,7 @@ export const Layout = () => {
       <Header />
 
       {/* This pushes content below fixed header */}
-      <main className="pt-20 flex-1">
+      <main className="pt-8 flex-1">
         <Outlet />
       </main>
 
