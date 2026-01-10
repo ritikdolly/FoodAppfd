@@ -4,13 +4,20 @@ import { Layout } from './Layout/Layout'
 import { DashBoard } from './components/admin/dashboard/DashBoard'
 import { Home } from './components/user/home/Home'
 import { ProductPage } from '../src/pages/ProductPage'
+import { AddCart } from './pages/AddCart'
+import { CartProvider } from './context/CartContext'
+import { PlaceOrder } from './pages/PlaceOrder'
 
 const router=createBrowserRouter([
   {path:'/',element:<Layout/>,
     children:[
       // {index:true,element:<DashBoard/>},
       {index:true,element:<Home/>},
-      {path:'/product/:id',element:<ProductPage/>}
+      // {index:true,element:<PlaceOrder/>},
+      {path:'/product/:id',element:<ProductPage/>},
+      {path:'/addCart',element: <AddCart/>},
+      {path:'/placeOrder',element: <PlaceOrder/>}
+      
     ]
   }
 ])
@@ -18,7 +25,10 @@ const router=createBrowserRouter([
 function App() {
   return (
     <>
-    <RouterProvider router={router} />
+    <CartProvider>
+      <RouterProvider router={router} />
+    </CartProvider>
+    {/* <RouterProvider router={router} /> */}
     {/* <Layout/> */}
     {/* <H1>Ritik Kumar</H1> */}
     </>
