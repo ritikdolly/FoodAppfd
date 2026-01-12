@@ -5,7 +5,6 @@ export const Hero = () => {
     <section className="relative bg-gradient-to-r from-orange-50 to-amber-50">
       <div className="max-w-7xl mx-auto px-4 pt-28 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
           {/* LEFT CONTENT */}
           <div className="space-y-6">
             <span className="inline-block bg-orange-100 text-orange-600 px-4 py-1.5 rounded-full text-sm font-medium">
@@ -21,19 +20,6 @@ export const Hero = () => {
               Order from your favorite restaurants and enjoy hot, fresh meals
               delivered quickly to your home or office.
             </p>
-
-            {/* SEARCH BAR */}
-            <div className="flex items-center bg-white rounded-full shadow-md max-w-xl overflow-hidden">
-              <Search className="w-5 h-5 ml-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for food, restaurants..."
-                className="flex-1 px-4 py-4 outline-none text-sm md:text-base"
-              />
-              <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-4 font-medium">
-                Search
-              </button>
-            </div>
 
             {/* CTA BUTTONS */}
             <div className="flex gap-4 pt-4">
@@ -55,7 +41,6 @@ export const Hero = () => {
               className="relative rounded-3xl shadow-xl"
             />
           </div>
-
         </div>
       </div>
     </section>
