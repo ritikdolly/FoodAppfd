@@ -7,24 +7,32 @@ import { MobileActions } from "../components/header/MobileActions";
 import { MobileDrawer } from "../components/header/MobileDrawer";
 import { navLinks } from "../components/header/navLinks";
 
+import { SignInModal } from "../components/auth/SignInModal";
+import { SignUpModal } from "../components/auth/SignUpModal";
+
 export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
 
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
+
+  // Header shadow on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock body scroll when mobile drawer opens
   useEffect(() => {
     document.body.style.overflow = drawerOpen ? "hidden" : "auto";
   }, [drawerOpen]);
 
   return (
     <>
-      {/* FIXED HEADER */}
+      {/* HEADER */}
       <header
         className={`
           fixed top-0 left-0 w-full z-50 bg-white/95 transition
@@ -35,7 +43,6 @@ export const Header = () => {
           }
         `}
       >
-        {/* CONTAINER INSIDE FIXED HEADER */}
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <Logo />
 
@@ -46,24 +53,46 @@ export const Header = () => {
           />
 
           <NavLinks links={navLinks} />
-          {/* <DesktopActions cartCount={3} /> */}
+
           <DesktopActions
             cartCount={3}
-            isLoggedIn={true} // false → Sign In / Sign Up
-            user={{ name: "Ritik", initials: "RK" }}
-            onLogin={() => console.log("login")}
-            onSignup={() => console.log("signup")}
+            isLoggedIn={false}
+            onLogin={() => setShowSignIn(true)}
+            onSignup={() => setShowSignUp(true)}
             onLogout={() => console.log("logout")}
           />
 
-          <MobileActions cartCount={3} onOpen={() => setDrawerOpen(true)} />
+          <MobileActions
+            cartCount={3}
+            onOpen={() => setDrawerOpen(true)}
+          />
         </div>
       </header>
 
+      {/* MOBILE DRAWER */}
       <MobileDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         links={navLinks}
+      />
+
+      {/* AUTH MODALS */}
+      <SignInModal
+        open={showSignIn}
+        onClose={() => setShowSignIn(false)}
+        onSwitch={() => {
+          setShowSignIn(false);
+          setShowSignUp(true);
+        }}
+      />
+
+      <SignUpModal
+        open={showSignUp}
+        onClose={() => setShowSignUp(false)}
+        onSwitch={() => {
+          setShowSignUp(false);
+          setShowSignIn(true);
+        }}
       />
     </>
   );

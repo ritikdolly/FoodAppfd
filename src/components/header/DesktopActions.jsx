@@ -5,15 +5,18 @@ import {
   User,
   Settings,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const DesktopActions = ({
   cartCount = 0,
   isLoggedIn = false,
-  user = null,
+  user = { name: "Ritik", initials: "RK" },
   onLogin,
   onSignup,
   onLogout,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="hidden md:flex items-center gap-3 border-l pl-6">
       {/* Favorites */}
@@ -22,7 +25,10 @@ export const DesktopActions = ({
       </button>
 
       {/* Cart */}
-      <button className="relative p-2 hover:bg-orange-50 rounded-full">
+      <button
+        onClick={() => navigate("/cart")}
+        className="relative p-2 hover:bg-orange-50 rounded-full"
+      >
         <ShoppingCart className="w-5 h-5" />
         {cartCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1.5 rounded-full border-2 border-white">
@@ -41,6 +47,7 @@ export const DesktopActions = ({
           >
             Sign In
           </button>
+
           <button
             onClick={onSignup}
             className="px-4 py-1.5 text-sm font-medium bg-orange-600 text-white rounded-full hover:bg-orange-700"
@@ -51,31 +58,28 @@ export const DesktopActions = ({
       ) : (
         /* LOGGED IN */
         <div className="relative group">
-          {/* Avatar with shadow */}
+          {/* Avatar */}
           <div
             className="
               flex items-center gap-2 p-1.5 pr-3 rounded-full cursor-pointer
-              bg-white
-              shadow-[rgba(17,17,26,0.1)_0px_0px_16px]
-              hover:bg-gray-50
-              transition
+              bg-white shadow-[rgba(17,17,26,0.1)_0px_0px_16px]
+              hover:bg-gray-50 transition
             "
           >
             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-600">
-              {user?.initials || "RK"}
+              {user.initials}
             </div>
             <span className="hidden lg:block text-sm font-medium">
-              {user?.name || "My Account"}
+              {user.name}
             </span>
           </div>
 
-          {/* DROPDOWN */}
+          {/* Dropdown */}
           <div
             className="
               absolute right-0 top-full mt-2 w-48 bg-white border rounded-xl
               shadow-[rgba(17,17,26,0.1)_0px_0px_16px]
-              opacity-0 invisible
-              group-hover:opacity-100 group-hover:visible
+              opacity-0 invisible group-hover:opacity-100 group-hover:visible
               transition-all
             "
           >

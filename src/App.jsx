@@ -15,7 +15,7 @@ const router=createBrowserRouter([
       {index:true,element:<Home/>},
       // {index:true,element:<PlaceOrder/>},
       {path:'/product/:id',element:<ProductPage/>},
-      {path:'/addCart',element: <AddCart/>},
+      {path:'/cart',element: <AddCart/>},
       {path:'/placeOrder',element: <PlaceOrder/>}
       
     ]
