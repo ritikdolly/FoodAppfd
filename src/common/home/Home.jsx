@@ -1,7 +1,7 @@
 import { useState } from "react";
-import {productsData} from "../../../data/productsData";
+import {productsData} from "../../data/productsData";
 import { TypeFilter } from "../filters/TypeFilter";
-import { ProductList } from "../../products/ProductList";
+import { ProductList } from "../../components/products/ProductList";
 import { Hero } from "../hero/Hero";
 
 export const Home = () => {
