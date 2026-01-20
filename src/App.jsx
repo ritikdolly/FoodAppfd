@@ -6,8 +6,14 @@ import { ProductPage } from '../src/pages/ProductPage'
 import { AddCart } from './pages/AddCart'
 import { CartProvider } from './context/CartContext'
 import { PlaceOrder } from './pages/PlaceOrder'
+import { OrderList } from './components/admin/Orders/OrderList'
+import { OffersPage } from './components/admin/offers/OffersPage'
+import { FoodPage } from './components/admin/food/FoodPage'
+import { AdminLayout } from './components/admin/layout/AdminLayout'
 
 const router=createBrowserRouter([
+
+  // for user layout
   {path:'/',element:<Layout/>,
     children:[
       // {index:true,element:<DashBoard/>},
@@ -17,8 +23,20 @@ const router=createBrowserRouter([
       {path:'/cart',element: <AddCart/>},
       {path:'/placeOrder',element: <PlaceOrder/>}
       
-    ]
-  }
+    ],
+  },
+
+  //  for admin layout
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <h1>Admin Dashboard</h1> },
+      { path: "orders", element: <OrderList/>},
+      { path: "food", element: <FoodPage/>},
+      { path: "offers", element: <OffersPage/> },
+    ],
+  },
 ])
 
 function App() {
