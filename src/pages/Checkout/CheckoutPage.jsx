@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useCart } from "../context/CartContext";
-import { OrderItems } from "../components/checkout/OrderItems";
-import { AddressSection } from "../components/checkout/AddressSection";
-import { PaymentMethod } from "../components/checkout/PaymentMethod";
-import { OrderSummary } from "../components/checkout/OrderSummary";
+import { useCart } from "../../context/CartContext";
+import { OrderItems } from "../../components/checkout/OrderItems";
+import { AddressSection } from "../../components/checkout/AddressSection";
+import { PaymentMethod } from "../../components/checkout/PaymentMethod";
+import { OrderSummary } from "../../components/checkout/OrderSummary";
 
-export const PlaceOrder = () => {
+export const CheckoutPage = () => {
   const { cartItems } = useCart();
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
@@ -44,10 +44,7 @@ export const PlaceOrder = () => {
           </div>
 
           {/* RIGHT */}
-          <OrderSummary
-            items={cartItems}
-            onPlaceOrder={handlePlaceOrder}
-          />
+          <OrderSummary items={cartItems} onPlaceOrder={handlePlaceOrder} />
         </div>
       </div>
     </main>

@@ -1,14 +1,14 @@
 import { useState } from "react";
-import {productsData} from "../../data/productsData";
-import { TypeFilter } from "../filters/TypeFilter";
+import { productsData } from "../../data/productsData";
+import { TypeFilter } from "../../common/filters/TypeFilter";
 import { ProductList } from "../../components/products/ProductList";
-import { Hero } from "../hero/Hero";
+import { Hero } from "../../common/hero/Hero";
 
 export const Home = () => {
   const [activeType, setActiveType] = useState("veg");
 
   const filteredProducts = productsData.products.filter((product) =>
-    product.types.includes(activeType)
+    product.types.includes(activeType),
   );
 
   return (
@@ -17,7 +17,7 @@ export const Home = () => {
         Explore Our Menu
       </h1> */}
 
-      <Hero/>
+      <Hero />
 
       <TypeFilter
         types={productsData.types}

@@ -7,19 +7,17 @@ export const Logo = () => {
   return (
     <div
       onClick={() => navigate("/")}
-      className="flex items-center gap-2 cursor-pointer"
+      className="flex items-center gap-2 cursor-pointer group"
     >
-      <div className="bg-orange-500 p-1.5 rounded-lg">
+      <div className="bg-[#FF4B2B] p-2 rounded-xl transition-transform group-hover:scale-110 shadow-lg shadow-orange-500/30">
         <UtensilsCrossed className="w-6 h-6 text-white" />
       </div>
 
-      <span className="hidden sm:block text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-500">
-        Prajapati Line Hotel Tulbul
+      <span className="hidden sm:block text-2xl font-bold text-[#2D3436] tracking-tight">
+        Prajapati<span className="text-[#FF4B2B]">Line</span>Hotel
       </span>
 
-      <span className="sm:hidden text-lg font-bold text-orange-600">
-        PLH
-      </span>
+      <span className="sm:hidden text-xl font-bold text-[#FF4B2B]">PLH</span>
     </div>
   );
 };

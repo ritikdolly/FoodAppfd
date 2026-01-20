@@ -35,12 +35,9 @@ export const Header = () => {
       {/* HEADER */}
       <header
         className={`
-          fixed top-0 left-0 w-full z-50 bg-white/95 transition
-          ${
-            scrolled
-              ? "shadow-[rgba(17,17,26,0.1)_0px_1px_0px]"
-              : "border-b border-gray-100"
-          }
+          fixed top-0 left-0 w-full z-50 transition-all duration-300
+          bg-white/80 backdrop-blur-md border-b border-gray-200/50 supports-backdrop-filter:bg-white/60
+          ${scrolled ? "shadow-md py-2" : "py-4 shadow-sm"}
         `}
       >
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
@@ -62,10 +59,7 @@ export const Header = () => {
             onLogout={() => console.log("logout")}
           />
 
-          <MobileActions
-            cartCount={3}
-            onOpen={() => setDrawerOpen(true)}
-          />
+          <MobileActions cartCount={3} onOpen={() => setDrawerOpen(true)} />
         </div>
       </header>
 

@@ -1,8 +1,8 @@
-import { useCart } from "../context/CartContext";
-import { CartList } from "../components/cart/CartList";
-import { CartSummary } from "../components/cart/CartSummary";
+import { useCart } from "../../context/CartContext";
+import { CartList } from "../../components/cart/CartList";
+import { CartSummary } from "../../components/cart/CartSummary";
 
-export const AddCart = () => {
+export const CartPage = () => {
   const { cartItems, updateQty, removeFromCart } = useCart();
 
   return (

@@ -1,52 +1,57 @@
 import { Link } from "react-router-dom";
 import { ProductRating } from "./ProductRating";
+import { Button } from "../ui/Button"; // Import Button
+import { Card } from "../ui/Card"; // Import Card
 
 export const ProductCard = ({ product }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden group">
-      
+    <Card className="p-0 overflow-hidden group h-full flex flex-col hover:shadow-xl transition-shadow duration-300 border-border/50">
       {/* IMAGE + NAME → LINK */}
       <Link
         to={`/product/${product.id}`}
-        className="block focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="block relative overflow-hidden"
       >
+        <div className="absolute top-3 right-3 z-10">
+          <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm">
+            {product.time || "30 min"}
+          </span>
+        </div>
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="w-full h-44 object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
         />
-
-        <div className="p-4 space-y-2">
-          <h3 className="font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
-            {product.name}
-          </h3>
-
-          <ProductRating rating={product.rating} />
-
-          <p className="text-sm text-gray-500">{product.quantity}</p>
-        </div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </Link>
 
-      {/* FOOTER (NOT A LINK) */}
-      <div className="px-4 pb-4 flex justify-between items-center">
-        <span className="font-bold text-orange-600">
-          ₹{product.price}
-        </span>
+      <div className="p-5 flex flex-col flex-1 gap-2">
+        <div className="flex justify-between items-start">
+          <Link to={`/product/${product.id}`}>
+            <h3 className="text-lg font-bold text-[#2D3436] group-hover:text-[#FF4B2B] transition-colors line-clamp-1">
+              {product.name}
+            </h3>
+          </Link>
+          <span className="text-xl font-bold text-[#FF4B2B]">
+            ₹{product.price}
+          </span>
+        </div>
 
-        <button
-          disabled={!product.availability}
-          className="
-            px-4 py-1.5 text-sm rounded-full font-medium
-            bg-orange-600 text-white
-            hover:bg-orange-700
-            active:scale-95
-            disabled:bg-gray-300 disabled:cursor-not-allowed
-            transition
-          "
-        >
-          Add
-        </button>
+        <ProductRating rating={product.rating} />
+
+        <p className="text-sm text-gray-500 line-clamp-2">
+          {product.description || product.quantity}
+        </p>
+
+        <div className="mt-auto pt-4 flex items-center justify-between gap-3">
+          <Button
+            variant="outline"
+            className="w-full rounded-xl text-sm py-2 hover:bg-[#FF4B2B] hover:text-white border-[#FF4B2B]/20"
+            disabled={!product.availability}
+          >
+            {product.availability ? "Add to Cart" : "Out of Stock"}
+          </Button>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };

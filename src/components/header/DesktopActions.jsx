@@ -1,11 +1,6 @@
-import {
-  Heart,
-  ShoppingCart,
-  LogOut,
-  User,
-  Settings,
-} from "lucide-react";
+import { Heart, ShoppingCart, LogOut, User, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/Button";
 
 export const DesktopActions = ({
   cartCount = 0,
@@ -40,20 +35,14 @@ export const DesktopActions = ({
       {/* AUTH SECTION */}
       {!isLoggedIn ? (
         /* NOT LOGGED IN */
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onLogin}
-            className="px-4 py-1.5 text-sm font-medium text-gray-700 hover:text-orange-600"
-          >
+        <div className="flex items-center gap-4">
+          <Button onClick={onLogin} variant="ghost">
             Sign In
-          </button>
+          </Button>
 
-          <button
-            onClick={onSignup}
-            className="px-4 py-1.5 text-sm font-medium bg-orange-600 text-white rounded-full hover:bg-orange-700"
-          >
+          <Button onClick={onSignup} variant="primary">
             Sign Up
-          </button>
+          </Button>
         </div>
       ) : (
         /* LOGGED IN */
