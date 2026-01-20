@@ -1,14 +1,18 @@
 import { useEffect } from "react";
-import { X, Heart, MapPin, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { X, Heart, MapPin, User, LogOut, ShoppingBag } from "lucide-react";
 
 export const MobileDrawer = ({
   open,
   onClose,
   links,
   isLoggedIn = false,
+  user,
   onLogin,
   onLogout,
 }) => {
+  const navigate = useNavigate();
+
   // 🔒 Lock body scroll
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
@@ -53,28 +57,78 @@ export const MobileDrawer = ({
           ))}
 
           {/* Account */}
-          <div className="border-t pt-4 space-y-2">
-            <div className="flex gap-3 px-4 py-2">
-              <Heart /> Favorites
-            </div>
-            <div className="flex gap-3 px-4 py-2">
-              <MapPin /> Addresses
-            </div>
-
+          {/* Account Section */}
+          <div className="border-t border-gray-100 pt-6 mt-2">
             {!isLoggedIn ? (
               <button
                 onClick={onLogin}
-                className="flex gap-3 px-4 py-2 text-orange-600 font-medium"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#FF4B2B] text-white rounded-xl font-bold shadow-lg shadow-[#FF4B2B]/20"
               >
-                <User /> Sign In / Sign Up
+                <User className="w-5 h-5" /> Sign In / Sign Up
               </button>
             ) : (
-              <button
-                onClick={onLogout}
-                className="flex gap-3 px-4 py-2 text-red-600 font-medium"
-              >
-                <LogOut /> Logout
-              </button>
+              <div className="space-y-4">
+                {/* User Info */}
+                <div className="flex items-center gap-3 px-2 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-lg">
+                    {user?.initials || "U"}
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-800">
+                      {user?.name || "User"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {user?.email || "user@example.com"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <button
+                    onClick={() => {
+                      navigate("/profile");
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
+                  >
+                    <User className="w-5 h-5 text-gray-400" /> My Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/orders");
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
+                  >
+                    <ShoppingBag className="w-5 h-5 text-gray-400" /> My Orders
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/favorites");
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
+                  >
+                    <Heart className="w-5 h-5 text-gray-400" /> Favorites
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/addresses");
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
+                  >
+                    <MapPin className="w-5 h-5 text-gray-400" /> Saved Addresses
+                  </button>
+                </div>
+
+                <button
+                  onClick={onLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium mt-2"
+                >
+                  <LogOut className="w-5 h-5" /> Logout
+                </button>
+              </div>
             )}
           </div>
         </div>

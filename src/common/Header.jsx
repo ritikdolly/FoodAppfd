@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useCart } from "../context/CartContext";
 import { Logo } from "../components/header/Logo";
 import { SearchBar } from "../components/header/SearchBar";
 import { NavLinks } from "../components/header/NavLinks.jsx";
@@ -11,12 +12,27 @@ import { SignInModal } from "../components/auth/SignInModal";
 import { SignUpModal } from "../components/auth/SignUpModal";
 
 export const Header = () => {
+  const { cartItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
 
   const [showSignIn, setShowSignIn] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
+
+  // Auth State
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const user = { name: "Ritik", initials: "RK", email: "ritik@example.com" };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setShowSignIn(false);
+    setShowSignUp(false);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
 
   // Header shadow on scroll
   useEffect(() => {
@@ -52,14 +68,18 @@ export const Header = () => {
           <NavLinks links={navLinks} />
 
           <DesktopActions
-            cartCount={3}
-            isLoggedIn={false}
+            cartCount={cartItems.length}
+            isLoggedIn={isLoggedIn}
+            user={user}
             onLogin={() => setShowSignIn(true)}
             onSignup={() => setShowSignUp(true)}
-            onLogout={() => console.log("logout")}
+            onLogout={handleLogout}
           />
 
-          <MobileActions cartCount={3} onOpen={() => setDrawerOpen(true)} />
+          <MobileActions
+            cartCount={cartItems.length}
+            onOpen={() => setDrawerOpen(true)}
+          />
         </div>
       </header>
 
@@ -68,6 +88,16 @@ export const Header = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         links={navLinks}
+        isLoggedIn={isLoggedIn}
+        user={user}
+        onLogin={() => {
+          setDrawerOpen(false);
+          setShowSignIn(true);
+        }}
+        onLogout={() => {
+          setDrawerOpen(false);
+          handleLogout();
+        }}
       />
 
       {/* AUTH MODALS */}
@@ -78,6 +108,7 @@ export const Header = () => {
           setShowSignIn(false);
           setShowSignUp(true);
         }}
+        onLogin={handleLogin}
       />
 
       <SignUpModal
@@ -87,6 +118,7 @@ export const Header = () => {
           setShowSignUp(false);
           setShowSignIn(true);
         }}
+        onLogin={handleLogin}
       />
     </>
   );

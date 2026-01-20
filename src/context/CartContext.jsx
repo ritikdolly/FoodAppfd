@@ -11,9 +11,7 @@ export const CartProvider = ({ children }) => {
 
       if (existing) {
         return prev.map((i) =>
-          i.id === product.id
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
+          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i,
         );
       }
 
@@ -26,14 +24,14 @@ export const CartProvider = ({ children }) => {
 
   const updateQty = (id, qty) =>
     setCartItems((prev) =>
-      prev.map((i) =>
-        i.id === id ? { ...i, quantity: Math.max(1, qty) } : i
-      )
+      prev.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, qty) } : i)),
     );
+
+  const clearCart = () => setCartItems([]);
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, updateQty }}
+      value={{ cartItems, addToCart, removeFromCart, updateQty, clearCart }}
     >
       {children}
     </CartContext.Provider>

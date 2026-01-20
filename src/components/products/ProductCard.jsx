@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { ProductRating } from "./ProductRating";
+import { useCart } from "../../context/CartContext";
 import { Button } from "../ui/Button"; // Import Button
 import { Card } from "../ui/Card"; // Import Card
 
 export const ProductCard = ({ product }) => {
+  const { addToCart } = useCart();
   return (
     <Card className="p-0 overflow-hidden group h-full flex flex-col hover:shadow-xl transition-shadow duration-300 border-border/50">
       {/* IMAGE + NAME → LINK */}
@@ -44,6 +46,7 @@ export const ProductCard = ({ product }) => {
 
         <div className="mt-auto pt-4 flex items-center justify-between gap-3">
           <Button
+            onClick={() => addToCart(product)}
             variant="outline"
             className="w-full rounded-xl text-sm py-2 hover:bg-[#FF4B2B] hover:text-white border-[#FF4B2B]/20"
             disabled={!product.availability}

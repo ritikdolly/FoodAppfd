@@ -1,4 +1,11 @@
-import { Heart, ShoppingCart, LogOut, User, Settings } from "lucide-react";
+import {
+  Heart,
+  ShoppingCart,
+  LogOut,
+  User,
+  Settings,
+  ShoppingBag,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 
@@ -72,12 +79,26 @@ export const DesktopActions = ({
               transition-all
             "
           >
-            <button className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50">
+            <button
+              onClick={() => navigate("/profile")}
+              className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50 text-left"
+            >
               <User className="w-4 h-4" />
               Profile
             </button>
 
-            <button className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50">
+            <button
+              onClick={() => navigate("/orders")}
+              className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50 text-left"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              My Orders
+            </button>
+
+            <button
+              onClick={() => navigate("/profile")}
+              className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50 text-left"
+            >
               <Settings className="w-4 h-4" />
               Settings
             </button>

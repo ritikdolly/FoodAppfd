@@ -5,8 +5,11 @@ import { AddressSection } from "../../components/checkout/AddressSection";
 import { PaymentMethod } from "../../components/checkout/PaymentMethod";
 import { OrderSummary } from "../../components/checkout/OrderSummary";
 
+import { useNavigate } from "react-router-dom";
+
 export const CheckoutPage = () => {
-  const { cartItems } = useCart();
+  const navigate = useNavigate();
+  const { cartItems, clearCart } = useCart();
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
@@ -24,7 +27,11 @@ export const CheckoutPage = () => {
     };
 
     console.log("Order placed:", orderPayload);
-    alert("Order placed successfully!");
+    // In a real app, this would be an API call
+
+    // Simulate successful order
+    clearCart();
+    navigate("/orders");
   };
 
   return (

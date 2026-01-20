@@ -11,6 +11,13 @@ import { OffersPage } from "./pages/Admin/Offers/OffersPage";
 import { FoodPage } from "./pages/Admin/Food/FoodPage";
 import { AdminLayout } from "./components/layout/AdminLayout/AdminLayout";
 import { AdminDashboard } from "./pages/Admin/Dashboard/AdminDashboard";
+import { ProfilePage } from "./pages/User/ProfilePage";
+import { FavoritesPage } from "./pages/User/FavoritesPage";
+import { AddressPage } from "./pages/User/AddressPage";
+import { OrdersPage } from "./pages/User/OrdersPage";
+import { OrderTrackingPage } from "./pages/User/OrderTrackingPage";
+import { InvoicePage } from "./pages/User/InvoicePage";
+import { HelpPage } from "./pages/User/HelpPage";
 
 const router = createBrowserRouter([
   // for user layout
@@ -22,6 +29,13 @@ const router = createBrowserRouter([
       { path: "/product/:id", element: <ProductPage /> },
       { path: "/cart", element: <CartPage /> },
       { path: "/placeOrder", element: <CheckoutPage /> },
+      { path: "/profile", element: <ProfilePage /> },
+      { path: "/favorites", element: <FavoritesPage /> },
+      { path: "/addresses", element: <AddressPage /> },
+      { path: "/orders", element: <OrdersPage /> },
+      { path: "/order-tracking/:id", element: <OrderTrackingPage /> },
+      { path: "/invoice/:id", element: <InvoicePage /> },
+      { path: "/help", element: <HelpPage /> },
     ],
   },
 

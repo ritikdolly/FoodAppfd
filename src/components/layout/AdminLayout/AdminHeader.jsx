@@ -1,15 +1,25 @@
-import { Search, Bell, LogOut } from "lucide-react";
+import { Search, Bell, LogOut, Menu } from "lucide-react";
 
-export const AdminHeader = () => {
+export const AdminHeader = ({ onMenuClick }) => {
   return (
-    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200/50 px-8 py-4 flex justify-between items-center">
-      {/* Search Bar - Optional enhancement */}
-      <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-gray-500 w-64 border border-transparent focus-within:border-[#FF4B2B]/50 focus-within:bg-white transition-all">
-        <Search className="w-4 h-4" />
-        <input
-          placeholder="Search..."
-          className="bg-transparent border-none outline-none text-sm w-full placeholder:text-gray-400"
-        />
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200/50 px-4 md:px-8 py-4 flex justify-between items-center">
+      <div className="flex items-center gap-4">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={onMenuClick}
+          className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+
+        {/* Search Bar - Optional enhancement */}
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-gray-500 w-64 border border-transparent focus-within:border-[#FF4B2B]/50 focus-within:bg-white transition-all">
+          <Search className="w-4 h-4" />
+          <input
+            placeholder="Search..."
+            className="bg-transparent border-none outline-none text-sm w-full placeholder:text-gray-400"
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-4 ml-auto">
