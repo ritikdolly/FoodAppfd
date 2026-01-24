@@ -8,7 +8,7 @@ export const FooterBrand = () => {
           <UtensilsCrossed className="w-6 h-6 text-white" />
         </div>
         <span className="text-2xl font-bold text-white">
-          Prajapati Line Hotel Tulbull
+          Prajapati Line Hotel
         </span>
       </div>
 

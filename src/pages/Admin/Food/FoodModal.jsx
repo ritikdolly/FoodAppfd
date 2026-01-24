@@ -17,9 +17,15 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
     reviews: [],
   });
 
+  const [imageMode, setImageMode] = useState("upload"); // "upload" or "url"
+
   useEffect(() => {
     if (initialData) {
       setFood(initialData);
+      // If the existing image is a URL (starts with http), default to URL mode (optional heuristic)
+      if (initialData.imageUrl && initialData.imageUrl.startsWith("http")) {
+        setImageMode("url");
+      }
     }
   }, [initialData]);
 
@@ -66,29 +72,82 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* IMAGE PREVIEW */}
-        <div className="flex justify-center">
-          <div className="relative w-full h-40 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden hover:border-[#FF4B2B] transition-colors cursor-pointer group">
+        {/* IMAGE INPUT TYPE TOGGLE */}
+        <div className="flex gap-4 mb-2">
+          <label className="flex items-center cursor-pointer gap-2">
             <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 opacity-0 cursor-pointer z-10"
+              type="radio"
+              name="imageMode"
+              value="upload"
+              checked={imageMode === "upload"}
+              onChange={() => setImageMode("upload")}
+              className="accent-[#FF4B2B]"
             />
-            {food.imageUrl ? (
-              <img
-                src={food.imageUrl}
-                alt="preview"
-                className="w-full h-full object-cover"
+            <span className="text-sm font-medium text-gray-700">
+              Upload Image
+            </span>
+          </label>
+          <label className="flex items-center cursor-pointer gap-2">
+            <input
+              type="radio"
+              name="imageMode"
+              value="url"
+              checked={imageMode === "url"}
+              onChange={() => setImageMode("url")}
+              className="accent-[#FF4B2B]"
+            />
+            <span className="text-sm font-medium text-gray-700">Image URL</span>
+          </label>
+        </div>
+
+        {/* IMAGE PREVIEW / INPUT */}
+        {imageMode === "upload" ? (
+          <div className="flex justify-center">
+            <div className="relative w-full h-40 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden hover:border-[#FF4B2B] transition-colors cursor-pointer group">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="absolute inset-0 opacity-0 cursor-pointer z-10"
               />
-            ) : (
-              <div className="text-center text-gray-400 group-hover:text-[#FF4B2B]">
-                <span className="block text-2xl mb-1">+</span>
-                <span className="text-sm font-medium">Upload Image</span>
+              {food.imageUrl ? (
+                <img
+                  src={food.imageUrl}
+                  alt="preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-center text-gray-400 group-hover:text-[#FF4B2B]">
+                  <span className="block text-2xl mb-1">+</span>
+                  <span className="text-sm font-medium">Upload Image</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <input
+              type="url"
+              placeholder="Paste Image URL here..."
+              value={food.imageUrl || ""}
+              onChange={(e) => setFood({ ...food, imageUrl: e.target.value })}
+              className={inputClass}
+            />
+            {food.imageUrl && (
+              <div className="w-full h-40 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                <img
+                  src={food.imageUrl}
+                  alt="preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) =>
+                    (e.target.src =
+                      "https://via.placeholder.com/400x300?text=Invalid+Image+URL")
+                  }
+                />
               </div>
             )}
           </div>
-        </div>
+        )}
 
         <input
           name="name"

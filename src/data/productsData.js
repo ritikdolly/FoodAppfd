@@ -19,7 +19,8 @@ export const productsData = {
       "quantity": "1 plate",
       "customerImages": [],
       "reviews": [
-        { "user": "Amit", "rating": 5, "comment": "Rich and creamy" }
+        { "user": "Amit", "rating": 5, "comment": "Rich and creamy" },
+        { "user": "Ritik", "rating": 4.5, "comment": "very good" }
       ],
       "comments": "Best seller",
       "availability": true
