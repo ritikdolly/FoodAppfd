@@ -1,31 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, MapPin, Edit2, Trash2, Home, Briefcase } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import { Modal } from "../../components/ui/Modal";
+import { addAddress, getAddresses } from "../../api/address";
 
 export const AddressPage = () => {
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      type: "Home",
-      name: "Ritik Kumar",
-      phone: "+91 98765 43210",
-      address: "123, Green Park Residency, Sector 4",
-      city: "New Delhi",
-      pincode: "110001",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      type: "Work",
-      name: "Ritik Kumar",
-      phone: "+91 98765 43210",
-      address: "Tech Hub Tower, 5th Floor, Cyber City",
-      city: "Gurugram",
-      pincode: "122002",
-      isDefault: false,
-    },
-  ]);
+  const [addresses, setAddresses] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    street: "",
+    city: "",
+    district: "",
+    state: "",
+    pin: "",
+    country: "India",
+    type: "Home",
+  });
+
+  const fetchAddresses = async () => {
+    try {
+      const data = await getAddresses();
+      setAddresses(data);
+    } catch (error) {
+      // Fallback to empty or error state
+    }
+  };
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const handleFormChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSaveAddress = async () => {
+    try {
+      await addAddress(formData);
+      setIsModalOpen(false);
+      fetchAddresses();
+      // Reset form
+      setFormData({
+        street: "",
+        city: "",
+        district: "",
+        state: "",
+        pin: "",
+        country: "India",
+        type: "Home",
+      });
+    } catch (error) {
+      alert("Failed to save address");
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -33,7 +61,10 @@ export const AddressPage = () => {
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-[#FF4B2B] to-[#FF416C]">
           Saved Addresses
         </h1>
-        <Button className="flex items-center gap-2 shadow-lg shadow-[#FF4B2B]/20">
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 shadow-lg shadow-[#FF4B2B]/20"
+        >
           <Plus className="w-4 h-4" /> Add New Address
         </Button>
       </div>
@@ -68,7 +99,8 @@ export const AddressPage = () => {
                 </div>
 
                 <p className="text-gray-600 leading-relaxed mb-4">
-                  {addr.address}, {addr.city}, {addr.pincode}
+                  {addr.street}, {addr.city}, {addr.district}, {addr.state} -{" "}
+                  {addr.pin}
                 </p>
 
                 <div className="flex items-center gap-4">
@@ -89,7 +121,76 @@ export const AddressPage = () => {
             </div>
           </Card>
         ))}
+        {addresses.length === 0 && (
+          <p className="text-gray-500 text-center col-span-full">
+            No addresses found.
+          </p>
+        )}
       </div>
+
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h2 className="text-xl font-bold mb-4 text-gray-900">
+          Add New Address
+        </h2>
+        <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Type
+            </label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleFormChange}
+              className="w-full border p-2 rounded"
+            >
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <input
+            name="street"
+            value={formData.street}
+            onChange={handleFormChange}
+            placeholder="Street"
+            className="w-full border p-2 rounded"
+          />
+          <input
+            name="city"
+            value={formData.city}
+            onChange={handleFormChange}
+            placeholder="City"
+            className="w-full border p-2 rounded"
+          />
+          <input
+            name="district"
+            value={formData.district}
+            onChange={handleFormChange}
+            placeholder="District"
+            className="w-full border p-2 rounded"
+          />
+          <input
+            name="state"
+            value={formData.state}
+            onChange={handleFormChange}
+            placeholder="State"
+            className="w-full border p-2 rounded"
+          />
+          <input
+            name="pin"
+            value={formData.pin}
+            onChange={handleFormChange}
+            placeholder="PIN Code"
+            className="w-full border p-2 rounded"
+          />
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSaveAddress}>Save Address</Button>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -1,8 +1,5 @@
 export const OrderSummary = ({ items, onPlaceOrder }) => {
-  const subtotal = items.reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0
-  );
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const delivery = items.length ? 40 : 0;
   const total = subtotal + delivery;

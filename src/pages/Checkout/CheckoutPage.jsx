@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createOrder } from "../../api/orders";
 import { useCart } from "../../context/CartContext";
 import { OrderItems } from "../../components/checkout/OrderItems";
 import { AddressSection } from "../../components/checkout/AddressSection";
@@ -13,7 +14,7 @@ export const CheckoutPage = () => {
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!address) {
       alert("Please enter delivery address");
       return;
@@ -24,14 +25,21 @@ export const CheckoutPage = () => {
       address,
       paymentMethod,
       date: new Date().toISOString(),
+      totalAmount: cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0,
+      ),
     };
 
-    console.log("Order placed:", orderPayload);
-    // In a real app, this would be an API call
-
-    // Simulate successful order
-    clearCart();
-    navigate("/orders");
+    try {
+      await createOrder(orderPayload);
+      // Simulate successful order
+      clearCart();
+      navigate("/orders");
+    } catch (error) {
+      alert("Failed to place order. Please try again.");
+      console.error("Order placement failed", error);
+    }
   };
 
   return (
