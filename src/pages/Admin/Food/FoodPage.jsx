@@ -1,35 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FoodList } from "./FoodList";
 import { FoodModal } from "./FoodModal";
+import {
+  createFood,
+  deleteFood,
+  getAllFoods,
+  updateFood,
+} from "../../../api/foods";
 
 export const FoodPage = () => {
-  const [foods, setFoods] = useState([
-    {
-      id: 1,
-      name: "Paneer Burger",
-      price: 120,
-      types: ["veg", "snacks"],
-      imageUrl:
-        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=60",
-      availability: true,
-      quantity: "20 plates",
-      comments: "Delicious grilled paneer with fresh veggies.",
-    },
-    {
-      id: 2,
-      name: "Chicken Pizza",
-      price: 299,
-      types: ["non-veg"],
-      imageUrl:
-        "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=500&q=60",
-      availability: true,
-      quantity: "15 pieces",
-      comments: "Cheesy delight with spicy chicken chunks.",
-    },
-  ]);
-
+  const [foods, setFoods] = useState([]);
   const [open, setOpen] = useState(false);
   const [editingFood, setEditingFood] = useState(null);
+
+  // Fetch when page loads
+  useEffect(() => {
+    fetchFoods();
+  }, []);
+
+  const fetchFoods = async () => {
+    try {
+      // setLoading(true);
+      const data = await getAllFoods();
+      console.log(data);
+      setFoods(data || []); // if null, set empty array
+    } catch (err) {
+      console.log(err);
+      setFoods([]);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditingFood(null);
@@ -41,23 +42,35 @@ export const FoodPage = () => {
     setOpen(true);
   };
 
-  const handleDelete = (id) => {
-    setFoods(foods.filter((food) => food.id !== id));
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this food item?")) {
+      try {
+        await deleteFood(id);
+        fetchFoods();
+      } catch (error) {
+        console.error("Error deleting food:", error);
+      }
+    }
   };
 
-  const handleSave = (foodData) => {
-    if (editingFood) {
-      // Edit
-      setFoods(
-        foods.map((f) =>
-          f.id === editingFood.id ? { ...foodData, id: f.id } : f,
-        ),
+  const handleSave = async (foodData) => {
+    try {
+      if (editingFood) {
+        // Edit existing
+        await updateFood(editingFood.id, foodData);
+      } else {
+        // Add new
+        await createFood(foodData);
+      }
+      fetchFoods(); // Refresh list
+      setOpen(false);
+    } catch (error) {
+      console.error("Error saving food:", error);
+      alert(
+        "Failed to save food: " +
+          (error.response?.data?.message || error.message),
       );
-    } else {
-      // Add
-      setFoods([...foods, { ...foodData, id: Date.now() }]);
     }
-    setOpen(false);
   };
 
   return (

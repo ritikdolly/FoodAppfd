@@ -20,14 +20,33 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
   const [imageMode, setImageMode] = useState("upload"); // "upload" or "url"
 
   useEffect(() => {
-    if (initialData) {
-      setFood(initialData);
-      // If the existing image is a URL (starts with http), default to URL mode (optional heuristic)
-      if (initialData.imageUrl && initialData.imageUrl.startsWith("http")) {
-        setImageMode("url");
+    if (open) {
+      if (initialData) {
+        setFood(initialData);
+        if (initialData.imageUrl && initialData.imageUrl.startsWith("http")) {
+          setImageMode("url");
+        } else {
+          setImageMode("upload");
+        }
+      } else {
+        // Reset for Add
+        setFood({
+          id: "",
+          name: "",
+          types: [],
+          imageUrl: "",
+          price: "",
+          rating: 4.5,
+          quantity: "",
+          comments: "",
+          availability: true,
+          customerImages: [],
+          reviews: [],
+        });
+        setImageMode("upload");
       }
     }
-  }, [initialData]);
+  }, [initialData, open]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -56,10 +75,15 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({
-      ...food,
-      id: food.id || "P" + Date.now(),
-    });
+    if (food.types.length === 0) {
+      alert("Please select at least one Food Type (Veg, Non-Veg, etc.)");
+      return;
+    }
+    if (!food.imageUrl) {
+      alert("Please provide an image (Upload or URL)");
+      return;
+    }
+    onSave(food);
   };
 
   const inputClass =
@@ -161,7 +185,7 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
         <div>
           <p className="text-sm font-medium mb-2 text-gray-700">Food Type</p>
           <div className="flex gap-3 flex-wrap">
-            {["veg", "non-veg", "snacks", "drinks"].map((type) => (
+            {["veg", "non-veg", "snacks", "drinks","sweets","cake"].map((type) => (
               <label
                 key={type}
                 className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors"
@@ -181,7 +205,7 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
         <div className="grid grid-cols-2 gap-4">
           <input
             name="price"
-            type="number"
+            type="text"
             placeholder="Price (₹)"
             value={food.price}
             onChange={handleChange}
@@ -194,6 +218,7 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
             value={food.quantity}
             onChange={handleChange}
             className={inputClass}
+            required
           />
         </div>
 

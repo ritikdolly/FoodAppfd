@@ -1,14 +1,67 @@
+import { useEffect, useState } from "react";
+import { getDashboardStats } from "../../../api/admin";
+
 export const AdminDashboard = () => {
+  const [data, setData] = useState({
+    totalOrders: 0,
+    foodItems: 0,
+    activeOffers: 0,
+    revenue: 0,
+  });
+
+  const [period, setPeriod] = useState("all");
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const stats = await getDashboardStats(period);
+        setData(stats);
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats", error);
+      }
+    };
+    fetchStats();
+  }, [period]);
+
   const stats = [
-    { title: "Total Orders", value: 128, color: "bg-blue-50 text-blue-600" },
-    { title: "Food Items", value: 24, color: "bg-orange-50 text-orange-600" },
-    { title: "Active Offers", value: 5, color: "bg-purple-50 text-purple-600" },
-    { title: "Revenue", value: "₹45,200", color: "bg-green-50 text-green-600" },
+    {
+      title: "Total Orders",
+      value: data.totalOrders,
+      color: "bg-blue-50 text-blue-600",
+    },
+    {
+      title: "Food Items",
+      value: data.foodItems,
+      color: "bg-orange-50 text-orange-600",
+    },
+    {
+      title: "Active Offers",
+      value: data.activeOffers,
+      color: "bg-purple-50 text-purple-600",
+    },
+    {
+      title: "Revenue",
+      value: `₹${data.revenue.toLocaleString()}`,
+      color: "bg-green-50 text-green-600",
+    },
   ];
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-[#FF4B2B]/50"
+        >
+          <option value="all">All Time</option>
+          <option value="daily">Today</option>
+          <option value="weekly">This Week</option>
+          <option value="monthly">This Month</option>
+          <option value="yearly">This Year</option>
+        </select>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((item, index) => (
