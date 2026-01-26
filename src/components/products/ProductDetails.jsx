@@ -14,10 +14,8 @@ export const ProductDetails = ({ product }) => {
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-12">
-
         {/* TOP SECTION */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          
           {/* IMAGE / MEDIA */}
           <aside className="relative">
             <div className="lg:sticky lg:top-28">
@@ -55,9 +53,12 @@ export const ProductDetails = ({ product }) => {
 
         {/* REVIEWS */}
         <section className="bg-white rounded-2xl shadow-sm p-6">
-          <ProductReviews reviews={product.reviews || []} />
+          <ProductReviews
+            reviews={product.reviews || []}
+            productId={product.id}
+            onUpdate={product.onUpdate}
+          />
         </section>
-
       </div>
     </main>
   );

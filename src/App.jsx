@@ -6,6 +6,7 @@ import { ProductPage } from "./pages/ProductPage";
 import { CartPage } from "./pages/Cart/CartPage";
 import { CartProvider } from "./context/CartContext";
 import { CheckoutPage } from "./pages/Checkout/CheckoutPage";
+import { ReviewList } from "./pages/Admin/Reviews/ReviewList";
 import { OrderList } from "./pages/Admin/Orders/OrderList";
 import { OffersPage } from "./pages/Admin/Offers/OffersPage";
 import { FoodPage } from "./pages/Admin/Food/FoodPage";
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       { path: "orders", element: <OrderList /> },
       { path: "food", element: <FoodPage /> },
       { path: "offers", element: <OffersPage /> },
+      { path: "reviews", element: <ReviewList /> },
     ],
   },
 ]);

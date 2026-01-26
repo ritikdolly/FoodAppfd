@@ -1,5 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Utensils, ShoppingBag, Tag, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Utensils,
+  ShoppingBag,
+  Tag,
+  X,
+  MessageSquare,
+} from "lucide-react";
 
 export const AdminSidebar = ({ open, onClose }) => {
   const linkClass = ({ isActive }) =>
@@ -77,6 +84,15 @@ export const AdminSidebar = ({ open, onClose }) => {
           >
             <Tag className="w-5 h-5" />
             Offers
+          </NavLink>
+
+          <NavLink
+            to="/admin/reviews"
+            className={linkClass}
+            onClick={() => onClose()}
+          >
+            <MessageSquare className="w-5 h-5" />
+            Reviews
           </NavLink>
         </nav>
 

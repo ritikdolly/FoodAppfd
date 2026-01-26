@@ -12,6 +12,8 @@ export const FoodPage = () => {
   const [foods, setFoods] = useState([]);
   const [open, setOpen] = useState(false);
   const [editingFood, setEditingFood] = useState(null);
+  const [filterType, setFilterType] = useState("All");
+  const [filterPrice, setFilterPrice] = useState("All");
 
   // Fetch when page loads
   useEffect(() => {
@@ -31,6 +33,29 @@ export const FoodPage = () => {
       // setLoading(false);
     }
   };
+
+  // Derive unique types from foods
+  const uniqueTypes = [...new Set(foods.flatMap((f) => f.types || []))];
+
+  // Filter logic
+  const filteredFoods = foods.filter((food) => {
+    // Type Filter
+    const matchesType =
+      filterType === "All" || (food.types && food.types.includes(filterType));
+
+    // Price Filter
+    let matchesPrice = true;
+    if (filterPrice !== "All") {
+      if (filterPrice === "0-100") matchesPrice = food.price < 100;
+      else if (filterPrice === "100-300")
+        matchesPrice = food.price >= 100 && food.price <= 300;
+      else if (filterPrice === "300-500")
+        matchesPrice = food.price > 300 && food.price <= 500;
+      else if (filterPrice === "500+") matchesPrice = food.price > 500;
+    }
+
+    return matchesType && matchesPrice;
+  });
 
   const handleAdd = () => {
     setEditingFood(null);
@@ -90,7 +115,49 @@ export const FoodPage = () => {
         </button>
       </div>
 
-      <FoodList foods={foods} onEdit={handleEdit} onDelete={handleDelete} />
+      {/* Filters */}
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-1/3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by Type
+          </label>
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="w-full border-gray-300 border rounded-lg p-2 focus:ring-[#FF4B2B] focus:border-[#FF4B2B]"
+          >
+            <option value="All">All Types</option>
+            {uniqueTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="w-full md:w-1/3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by Price
+          </label>
+          <select
+            value={filterPrice}
+            onChange={(e) => setFilterPrice(e.target.value)}
+            className="w-full border-gray-300 border rounded-lg p-2 focus:ring-[#FF4B2B] focus:border-[#FF4B2B]"
+          >
+            <option value="All">All Prices</option>
+            <option value="0-100">Under ₹100</option>
+            <option value="100-300">₹100 - ₹300</option>
+            <option value="300-500">₹300 - ₹500</option>
+            <option value="500+">Above ₹500</option>
+          </select>
+        </div>
+      </div>
+
+      <FoodList
+        foods={filteredFoods}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       <FoodModal
         open={open}

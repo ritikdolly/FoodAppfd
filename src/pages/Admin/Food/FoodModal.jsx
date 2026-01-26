@@ -4,7 +4,7 @@ import { Button } from "../../../components/ui/Button";
 
 export const FoodModal = ({ open, onClose, onSave, initialData }) => {
   const [food, setFood] = useState({
-    id: "",
+    id: null,
     name: "",
     types: [],
     imageUrl: "",
@@ -22,16 +22,20 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
   useEffect(() => {
     if (open) {
       if (initialData) {
-        setFood(initialData);
-        if (initialData.imageUrl && initialData.imageUrl.startsWith("http")) {
-          setImageMode("url");
-        } else {
-          setImageMode("upload");
-        }
+        setFood({
+          ...initialData,
+          imageUrl: initialData.imageUrl || "",
+          types: initialData.types || [],
+        });
+        setImageMode(
+          initialData.imageUrl && initialData.imageUrl.startsWith("http")
+            ? "url"
+            : "upload",
+        );
       } else {
         // Reset for Add
         setFood({
-          id: "",
+          id: null,
           name: "",
           types: [],
           imageUrl: "",
@@ -46,7 +50,7 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
         setImageMode("upload");
       }
     }
-  }, [initialData, open]);
+  }, [open, initialData]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -185,20 +189,22 @@ export const FoodModal = ({ open, onClose, onSave, initialData }) => {
         <div>
           <p className="text-sm font-medium mb-2 text-gray-700">Food Type</p>
           <div className="flex gap-3 flex-wrap">
-            {["veg", "non-veg", "snacks", "drinks","sweets","cake"].map((type) => (
-              <label
-                key={type}
-                className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors"
-              >
-                <input
-                  type="checkbox"
-                  checked={food.types.includes(type)}
-                  onChange={() => handleTypeChange(type)}
-                  className="accent-[#FF4B2B]"
-                />
-                <span className="text-sm capitalize">{type}</span>
-              </label>
-            ))}
+            {["veg", "non-veg", "snacks", "drinks", "sweets", "cake"].map(
+              (type) => (
+                <label
+                  key={type}
+                  className="flex items-center gap-2 cursor-pointer bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={food.types.includes(type)}
+                    onChange={() => handleTypeChange(type)}
+                    className="accent-[#FF4B2B]"
+                  />
+                  <span className="text-sm capitalize">{type}</span>
+                </label>
+              ),
+            )}
           </div>
         </div>
 

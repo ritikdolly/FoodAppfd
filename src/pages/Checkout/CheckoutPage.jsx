@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createOrder } from "../../api/orders";
+import { createPaymentOrder } from "../../api/payment";
 import { useCart } from "../../context/CartContext";
 import { OrderItems } from "../../components/checkout/OrderItems";
 import { AddressSection } from "../../components/checkout/AddressSection";
@@ -20,22 +21,61 @@ export const CheckoutPage = () => {
       return;
     }
 
+    const totalAmount = cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0,
+    );
+
     const orderPayload = {
       items: cartItems,
       address,
       paymentMethod,
       date: new Date().toISOString(),
-      totalAmount: cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0,
-      ),
+      total: totalAmount, // Match backend field name 'total'
+      status: "Processing",
     };
 
     try {
-      await createOrder(orderPayload);
-      // Simulate successful order
-      clearCart();
-      navigate("/orders");
+      if (paymentMethod === "Razorpay") {
+        const order = await createPaymentOrder(totalAmount);
+
+        const options = {
+          key: "rzp_test_YOUR_KEY_ID", // Replace with your Key ID
+          amount: order.amount,
+          currency: "INR",
+          name: "Food App",
+          description: "Order Payment",
+          order_id: order.id, // This is the order_id created in the backend
+          handler: async function (response) {
+            // Payment successful, now create the order in DB
+            orderPayload.paymentId = response.razorpay_payment_id;
+            orderPayload.status = "Paid"; // Or "Processing" depending on flow
+
+            await createOrder(orderPayload);
+            clearCart();
+            navigate("/orders");
+          },
+          prefill: {
+            name: "User Name", // valid user name
+            email: "user@example.com",
+            contact: "9999999999",
+          },
+          theme: {
+            color: "#FF4B2B",
+          },
+        };
+
+        const rzp1 = new window.Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          alert("Payment Failed: " + response.error.description);
+        });
+        rzp1.open();
+      } else {
+        // COD or other methods
+        await createOrder(orderPayload);
+        clearCart();
+        navigate("/orders");
+      }
     } catch (error) {
       alert("Failed to place order. Please try again.");
       console.error("Order placement failed", error);
