@@ -11,7 +11,7 @@ import { Button } from "../ui/Button";
 
 export const DesktopActions = ({
   cartCount = 0,
-  isLoggedIn = false,
+  isLoggedIn = true,
   user = { name: "Ritik", initials: "RK" },
   onLogin,
   onSignup,
@@ -40,7 +40,7 @@ export const DesktopActions = ({
       </button>
 
       {/* AUTH SECTION */}
-      {!isLoggedIn ? (
+      {isLoggedIn ? (
         /* NOT LOGGED IN */
         <div className="flex items-center gap-4">
           <Button onClick={onLogin} variant="ghost">
