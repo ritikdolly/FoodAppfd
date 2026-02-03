@@ -28,7 +28,13 @@ export const DesktopActions = ({
 
       {/* Cart */}
       <button
-        onClick={() => navigate("/cart")}
+        onClick={() => {
+          if (isLoggedIn) {
+            navigate("/auth/customer/cart");
+          } else {
+            onLogin();
+          }
+        }}
         className="relative p-2 hover:bg-orange-50 rounded-full"
       >
         <ShoppingCart className="w-5 h-5" />
@@ -40,7 +46,7 @@ export const DesktopActions = ({
       </button>
 
       {/* AUTH SECTION */}
-      {isLoggedIn ? (
+      {!isLoggedIn ? (
         /* NOT LOGGED IN */
         <div className="flex items-center gap-4">
           <Button onClick={onLogin} variant="ghost">
@@ -80,7 +86,7 @@ export const DesktopActions = ({
             "
           >
             <button
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("/auth/customer/profile")}
               className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50 text-left"
             >
               <User className="w-4 h-4" />
@@ -88,7 +94,7 @@ export const DesktopActions = ({
             </button>
 
             <button
-              onClick={() => navigate("/orders")}
+              onClick={() => navigate("/auth/customer/orders")}
               className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50 text-left"
             >
               <ShoppingBag className="w-4 h-4" />
@@ -96,7 +102,7 @@ export const DesktopActions = ({
             </button>
 
             <button
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate("/auth/customer/profile")}
               className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-gray-50 text-left"
             >
               <Settings className="w-4 h-4" />

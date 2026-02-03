@@ -1,190 +1,158 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "../ui/Modal";
-import { auth } from "../../config/firebase";
-import {
-  signInWithEmailAndPassword,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
+import { useAuth } from "../../context/AuthContext";
 
 export const SignInModal = ({ open, onClose, onSwitch }) => {
-  const [loginMethod, setLoginMethod] = useState("password"); // 'password' or 'otp'
+  const { login, sendOtp, verifyOtpLogin, setupRecaptcha } = useAuth();
 
-  // Password State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // OTP State
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] = useState(null);
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpLogin, setIsOtpLogin] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
 
-  const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "sign-in-recaptcha",
-        {
-          size: "invisible",
-          callback: () => {
-            // reCAPTCHA solved
-          },
-        },
-      );
+  useEffect(() => {
+    if (open && isOtpLogin) {
+      try {
+        setupRecaptcha("recaptcha-container");
+      } catch (e) {
+        // e.g. already rendered
+      }
     }
-  };
+  }, [open, isOtpLogin, setupRecaptcha]);
 
-  const handlePasswordLogin = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // alert("Logged in successfully!");
+      if (isOtpLogin) {
+        await verifyOtpLogin(otp);
+      } else {
+        await login(email, password);
+      }
       onClose();
     } catch (error) {
       console.error("Login error:", error);
-      alert(error.message);
+      alert(error.message || "Login failed");
     }
   };
 
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
+  const handleSendOtp = async () => {
     if (!phoneNumber) {
-      alert("Please enter a phone number");
+      alert("Please enter your phone number first");
       return;
     }
-
-    setupRecaptcha();
-    const appVerifier = window.recaptchaVerifier;
-
     try {
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        phoneNumber,
-        appVerifier,
-      );
-      setConfirmationResult(confirmation);
-      setIsOtpSent(true);
-      alert("OTP Sent Successfully!");
+      await sendOtp(phoneNumber);
+      setOtpSent(true);
+      alert("OTP sent to your phone");
     } catch (error) {
-      console.error("Error sending OTP:", error);
-      alert(error.message);
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-        window.recaptchaVerifier = null;
-      }
+      console.error("Send OTP error:", error);
+      alert(error.message || "Failed to send OTP");
     }
   };
 
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    if (!otp) return;
-
-    try {
-      await confirmationResult.confirm(otp);
-      alert("Logged in successfully!");
-      onClose();
-    } catch (error) {
-      console.error("Error verifying OTP:", error);
-      alert("Invalid OTP");
-    }
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+    setOtp("");
+    setPhoneNumber("");
+    setIsOtpLogin(false);
+    setOtpSent(false);
+    onClose();
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <h2 className="text-xl font-semibold mb-4">Sign In</h2>
+    <Modal open={open} onClose={resetForm}>
+      <h2 className="text-xl font-semibold mb-4">
+        {isOtpLogin ? "Sign In with Phone" : "Sign In"}
+      </h2>
 
-      {/* Toggle Login Method */}
-      <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
-        <button
-          onClick={() => setLoginMethod("password")}
-          className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
-            loginMethod === "password"
-              ? "bg-white text-gray-900 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Password
-        </button>
-        <button
-          onClick={() => setLoginMethod("otp")}
-          className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
-            loginMethod === "otp"
-              ? "bg-white text-gray-900 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          OTP
-        </button>
-      </div>
+      <form className="space-y-4" onSubmit={handleLogin}>
+        {!isOtpLogin && (
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            required
+          />
+        )}
 
-      <form className="space-y-4">
-        {loginMethod === "password" ? (
+        {isOtpLogin && !otpSent && (
+          <input
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="Phone Number (e.g. +1...)"
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            required
+          />
+        )}
+
+        {isOtpLogin ? (
           <>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-            <button
-              onClick={handlePasswordLogin}
-              className="w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700"
-            >
-              Sign In
-            </button>
-          </>
-        ) : (
-          /* OTP Login Flow */
-          <>
-            {!isOtpSent ? (
+            {otpSent && (
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                required
+              />
+            )}
+            {!otpSent && (
               <>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Phone Number (e.g., +91 XXXXXXXXXX)"
-                  className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
-                />
-                <div id="sign-in-recaptcha"></div>
+                <div id="recaptcha-container"></div>
                 <button
+                  type="button"
                   onClick={handleSendOtp}
-                  className="w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700"
+                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mb-2 mt-2"
                 >
                   Send OTP
                 </button>
               </>
-            ) : (
-              <>
-                <p className="text-sm text-gray-600 mb-2">
-                  Enter the OTP sent to {phoneNumber}
-                </p>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter 6-digit OTP"
-                  className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
-                />
-                <button
-                  onClick={handleVerifyOtp}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
-                >
-                  Verify OTP
-                </button>
-              </>
             )}
           </>
+        ) : (
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            required
+          />
+        )}
+
+        {(!isOtpLogin || otpSent) && (
+          <button
+            type="submit"
+            className="w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700"
+          >
+            Sign In
+          </button>
         )}
       </form>
+
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={() => {
+            setIsOtpLogin(!isOtpLogin);
+            setOtpSent(false);
+            setOtp("");
+            setPhoneNumber("");
+            setPassword("");
+            setEmail("");
+          }}
+          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+        >
+          {isOtpLogin ? "Login with Password" : "Login with Phone OTP"}
+        </button>
+      </div>
 
       <p className="text-sm text-center mt-4">
         Don’t have an account?{" "}

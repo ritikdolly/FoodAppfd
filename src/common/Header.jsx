@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { Logo } from "../components/header/Logo";
 import { SearchBar } from "../components/header/SearchBar";
 import { NavLinks } from "../components/header/NavLinks.jsx";
@@ -13,6 +14,7 @@ import { SignUpModal } from "../components/auth/SignUpModal";
 
 export const Header = () => {
   const { cartItems } = useCart();
+  const { currentUser, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchFocus, setSearchFocus] = useState(false);
@@ -20,18 +22,29 @@ export const Header = () => {
   const [showSignIn, setShowSignIn] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
 
-  // Auth State
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const user = { name: "Ritik", initials: "RK", email: "ritik@example.com" };
+  // Derived Auth State
+  const isLoggedIn = !!currentUser;
+  const user = {
+    name:
+      currentUser?.displayName || currentUser?.email?.split("@")[0] || "User",
+    initials: (currentUser?.displayName || currentUser?.email || "U")
+      .slice(0, 2)
+      .toUpperCase(),
+    email: currentUser?.email,
+  };
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
+    // Auth state handled by context, just close modals
     setShowSignIn(false);
     setShowSignUp(false);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   // Header shadow on scroll
@@ -79,6 +92,8 @@ export const Header = () => {
           <MobileActions
             cartCount={cartItems.length}
             onOpen={() => setDrawerOpen(true)}
+            isLoggedIn={isLoggedIn}
+            onLogin={() => setShowSignIn(true)}
           />
         </div>
       </header>
