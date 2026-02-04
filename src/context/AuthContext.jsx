@@ -1,18 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  signInWithPhoneNumber,
-  signOut,
-  RecaptchaVerifier,
-} from "firebase/auth";
-import { auth } from "../config/firebase";
 import { Loading } from "../common/Loading";
 import {
   login as apiLogin,
   register as apiRegister,
+  sendRegisterOtp as apiSendRegisterOtp,
   sendLoginOtp as apiSendLoginOtp,
   loginWithOtp as apiLoginWithOtp,
   verifyEmail as apiVerifyEmail,
-  loginWithPhone as apiLoginWithPhone,
 } from "../api/auth";
 
 const AuthContext = createContext();
@@ -25,7 +19,6 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [confirmationResult, setConfirmationResult] = useState(null);
 
   const getUserFromToken = (token) => {
     try {
@@ -65,6 +58,10 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const sendRegisterOtp = async (email) => {
+    return await apiSendRegisterOtp(email);
+  };
+
   const verifyEmail = async (email, otp) => {
     const data = await apiVerifyEmail(email, otp);
     handleAuthSuccess(data);
@@ -77,12 +74,6 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithOtp = async (email, otp) => {
     const data = await apiLoginWithOtp(email, otp);
-    handleAuthSuccess(data);
-    return data;
-  };
-
-  const loginWithPhone = async (phoneLoginRequest) => {
-    const data = await apiLoginWithPhone(phoneLoginRequest);
     handleAuthSuccess(data);
     return data;
   };
@@ -105,58 +96,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Firebase Phone Auth Helpers
-  const setupRecaptcha = (elementId) => {
-    if (window.recaptchaVerifier) {
-      try {
-        window.recaptchaVerifier.clear();
-      } catch (e) {
-        console.warn("Retrying recaptcha clear", e);
-      }
-      window.recaptchaVerifier = null;
-    }
-
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-      size: "invisible",
-      callback: () => {
-        // reCAPTCHA solved
-      },
-      "expired-callback": () => {
-        // Response expired. Ask user to solve reCAPTCHA again.
-      },
-    });
-  };
-
-  const sendPhoneOtp = async (phoneNumber) => {
-    const appVerifier = window.recaptchaVerifier;
-    if (!appVerifier) throw new Error("Recaptcha not initialized");
-
-    const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-    setConfirmationResult(result);
-    return result;
-  };
-
-  const verifyPhoneOtp = async (otp) => {
-    if (!confirmationResult) throw new Error("No VM sent"); // Verification Method/OTP
-    const result = await confirmationResult.confirm(otp);
-    const firebaseUser = result.user;
-    const token = await firebaseUser.getIdToken();
-
-    // Now call backend to sync/login
-    return await loginWithPhone({ token });
-  };
-
   const logout = async () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("role");
     localStorage.removeItem("user");
     setCurrentUser(null);
     setUserRole(null);
-    try {
-      await signOut(auth); // Clear firebase session if any
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   const value = {
@@ -164,12 +109,10 @@ export const AuthProvider = ({ children }) => {
     userRole,
     login,
     register,
+    sendRegisterOtp,
     verifyEmail,
     sendLoginOtp,
     loginWithOtp,
-    setupRecaptcha,
-    sendPhoneOtp, // Renamed from sendOtp to avoid confusion with Email OTP
-    verifyPhoneOtp, // Renamed verifyOtpLogin -> verifyPhoneOtp
     logout,
     loading,
   };

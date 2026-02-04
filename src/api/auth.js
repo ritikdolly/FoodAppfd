@@ -20,6 +20,16 @@ export const register = async (userData) => {
   }
 };
 
+export const sendRegisterOtp = async (email) => {
+  try {
+    const response = await client.post("/auth/signup/otp", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Send Register OTP API error:", error);
+    throw error.response?.data || error.message;
+  }
+};
+
 export const sendLoginOtp = async (email) => {
   try {
     const response = await client.post("/auth/otp/send", { email });
@@ -46,16 +56,6 @@ export const verifyEmail = async (email, otp) => {
     return response.data;
   } catch (error) {
     console.error("Verify Email API error:", error);
-    throw error.response?.data || error.message;
-  }
-};
-
-export const loginWithPhone = async (phoneLoginRequest) => {
-  try {
-    const response = await client.post("/auth/phone/login", phoneLoginRequest);
-    return response.data;
-  } catch (error) {
-    console.error("Phone Login API error:", error);
     throw error.response?.data || error.message;
   }
 };
