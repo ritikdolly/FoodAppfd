@@ -3,7 +3,7 @@ import { Modal } from "../ui/Modal";
 import { useAuth } from "../../context/AuthContext";
 
 export const SignInModal = ({ open, onClose, onSwitch }) => {
-  const { login, sendOtp, verifyOtpLogin, setupRecaptcha } = useAuth();
+  const { login, sendPhoneOtp, verifyPhoneOtp, setupRecaptcha } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +26,7 @@ export const SignInModal = ({ open, onClose, onSwitch }) => {
     e.preventDefault();
     try {
       if (isOtpLogin) {
-        await verifyOtpLogin(otp);
+        await verifyPhoneOtp(otp);
       } else {
         await login(email, password);
       }
@@ -42,10 +42,15 @@ export const SignInModal = ({ open, onClose, onSwitch }) => {
       alert("Please enter your phone number first");
       return;
     }
+    let formattedNumber = phoneNumber.trim();
+    if (!formattedNumber.startsWith("+")) {
+      formattedNumber = "+91" + formattedNumber;
+    }
     try {
-      await sendOtp(phoneNumber);
+      await sendPhoneOtp(formattedNumber);
       setOtpSent(true);
       alert("OTP sent to your phone");
+      setPhoneNumber(formattedNumber); // Update state to keep consistent
     } catch (error) {
       console.error("Send OTP error:", error);
       alert(error.message || "Failed to send OTP");

@@ -1,14 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   signInWithPhoneNumber,
   signOut,
-  onAuthStateChanged,
   RecaptchaVerifier,
 } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { Loading } from "../common/Loading";
+import {
+  login as apiLogin,
+  register as apiRegister,
+  sendLoginOtp as apiSendLoginOtp,
+  loginWithOtp as apiLoginWithOtp,
+  verifyEmail as apiVerifyEmail,
+  loginWithPhone as apiLoginWithPhone,
+} from "../api/auth";
 
 const AuthContext = createContext();
 
@@ -18,162 +23,139 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [userRole, setUserRole] = useState("ROLE_CUSTOMER");
+  const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
 
+  const getUserFromToken = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return { email: payload.sub };
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Sync with backend
-        try {
-          const token = await user.getIdToken();
-          localStorage.setItem("jwt", token);
+    // Check local storage for existing session
+    const jwt = localStorage.getItem("jwt");
+    const role = localStorage.getItem("role");
 
-          const response = await fetch("http://localhost:8080/api/auth/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
-          });
+    if (jwt) {
+      const userFromToken = getUserFromToken(jwt);
+      setUserRole(role || "ROLE_CUSTOMER");
 
-          if (response.ok) {
-            const data = await response.json();
-            setCurrentUser(user); // Firebase User still useful for client SDK
-
-            // Prefer backend data for app state
-            if (data.jwt) {
-              localStorage.setItem("jwt", data.jwt);
-            }
-            if (data.user) {
-              localStorage.setItem("user", JSON.stringify(data.user));
-              setUserRole(data.user.role || "CUSTOMER");
-            }
-          } else {
-            console.error("Backend sync failed");
-            // Handle failure? Logout?
-          }
-        } catch (error) {
-          console.error("Backend sync error", error);
-        }
+      if (userFromToken) {
+        setCurrentUser({ ...userFromToken, role: role || "ROLE_CUSTOMER" });
       } else {
-        setCurrentUser(null);
-        setUserRole("CUSTOMER");
-        localStorage.removeItem("user");
-        localStorage.removeItem("jwt");
+        setCurrentUser({ role: role || "ROLE_CUSTOMER" });
       }
-      setLoading(false);
-    });
-
-    return unsubscribe;
+    }
+    setLoading(false);
   }, []);
 
   const login = async (email, password) => {
-    try {
-      return await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      throw error;
-    }
+    const data = await apiLogin(email, password);
+    handleAuthSuccess(data);
+    return data;
   };
 
   const register = async (userData) => {
-    try {
-      // 1. Create User in Firebase (Email/Password)
-      const { email, password, role, fullName, phoneNumber } = userData;
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
+    const data = await apiRegister(userData);
+    return data;
+  };
 
-      // 2. Call Backend Register
-      const token = await user.getIdToken();
-      const response = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token,
-          fullName,
-          email,
-          role,
-          phoneNumber, // Optional if provided
-        }),
-      });
+  const verifyEmail = async (email, otp) => {
+    const data = await apiVerifyEmail(email, otp);
+    handleAuthSuccess(data);
+    return data;
+  };
 
-      if (!response.ok) {
-        throw new Error("Backend registration failed");
-      }
+  const sendLoginOtp = async (email) => {
+    return await apiSendLoginOtp(email);
+  };
 
-      const data = await response.json();
+  const loginWithOtp = async (email, otp) => {
+    const data = await apiLoginWithOtp(email, otp);
+    handleAuthSuccess(data);
+    return data;
+  };
 
-      // Update local storage
-      if (data.jwt) localStorage.setItem("jwt", data.jwt);
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setUserRole(data.user.role);
-        setCurrentUser(user);
-      }
+  const loginWithPhone = async (phoneLoginRequest) => {
+    const data = await apiLoginWithPhone(phoneLoginRequest);
+    handleAuthSuccess(data);
+    return data;
+  };
 
-      return data;
-    } catch (error) {
-      // If backend fails, maybe delete firebase user?
-      // For now just throw
-      throw error;
+  const handleAuthSuccess = (data) => {
+    if (data.jwt) {
+      localStorage.setItem("jwt", data.jwt);
+      localStorage.setItem("role", data.role);
+
+      const userFromToken = getUserFromToken(data.jwt);
+      const userObj = {
+        ...userFromToken,
+        role: data.role,
+      };
+      // Minimal user object storage if needed, mainly for role persistence if we don't decode on load
+      localStorage.setItem("user", JSON.stringify(userObj));
+
+      setCurrentUser(userObj);
+      setUserRole(data.role);
     }
   };
 
+  // Firebase Phone Auth Helpers
   const setupRecaptcha = (elementId) => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-        size: "invisible",
-        callback: () => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        },
-      });
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        console.warn("Retrying recaptcha clear", e);
+      }
+      window.recaptchaVerifier = null;
     }
+
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
+      size: "invisible",
+      callback: () => {
+        // reCAPTCHA solved
+      },
+      "expired-callback": () => {
+        // Response expired. Ask user to solve reCAPTCHA again.
+      },
+    });
   };
 
-  const sendOtp = async (phoneNumber) => {
-    try {
-      // Ensure recaptcha is set up in the UI component before calling this
-      // OR pass the element ID to this function.
-      // Ideally, setupRecaptcha is called in the component.
-      // Here we assume window.recaptchaVerifier is ready.
+  const sendPhoneOtp = async (phoneNumber) => {
+    const appVerifier = window.recaptchaVerifier;
+    if (!appVerifier) throw new Error("Recaptcha not initialized");
 
-      const appVerifier = window.recaptchaVerifier;
-      if (!appVerifier) throw new Error("Recaptcha not initialized");
-
-      const result = await signInWithPhoneNumber(
-        auth,
-        phoneNumber,
-        appVerifier,
-      );
-      setConfirmationResult(result);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+    setConfirmationResult(result);
+    return result;
   };
 
-  const verifyOtpLogin = async (otp) => {
-    if (!confirmationResult) throw new Error("No OTP sent");
-    try {
-      const result = await confirmationResult.confirm(otp);
-      return result.user;
-    } catch (error) {
-      throw error;
-    }
+  const verifyPhoneOtp = async (otp) => {
+    if (!confirmationResult) throw new Error("No VM sent"); // Verification Method/OTP
+    const result = await confirmationResult.confirm(otp);
+    const firebaseUser = result.user;
+    const token = await firebaseUser.getIdToken();
+
+    // Now call backend to sync/login
+    return await loginWithPhone({ token });
   };
 
   const logout = async () => {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+    setCurrentUser(null);
+    setUserRole(null);
     try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("Logout error", error);
+      await signOut(auth); // Clear firebase session if any
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -182,11 +164,14 @@ export const AuthProvider = ({ children }) => {
     userRole,
     login,
     register,
-    sendOtp,
-    verifyOtpLogin,
+    verifyEmail,
+    sendLoginOtp,
+    loginWithOtp,
+    setupRecaptcha,
+    sendPhoneOtp, // Renamed from sendOtp to avoid confusion with Email OTP
+    verifyPhoneOtp, // Renamed verifyOtpLogin -> verifyPhoneOtp
     logout,
     loading,
-    setupRecaptcha,
   };
 
   return (
