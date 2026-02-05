@@ -33,15 +33,20 @@ export const AuthProvider = ({ children }) => {
     // Check local storage for existing session
     const jwt = localStorage.getItem("jwt");
     const role = localStorage.getItem("role");
+    const userId = localStorage.getItem("userId");
 
     if (jwt) {
       const userFromToken = getUserFromToken(jwt);
       setUserRole(role || "ROLE_CUSTOMER");
 
       if (userFromToken) {
-        setCurrentUser({ ...userFromToken, role: role || "ROLE_CUSTOMER" });
+        setCurrentUser({
+          ...userFromToken,
+          role: role || "ROLE_CUSTOMER",
+          id: userId,
+        });
       } else {
-        setCurrentUser({ role: role || "ROLE_CUSTOMER" });
+        setCurrentUser({ role: role || "ROLE_CUSTOMER", id: userId });
       }
     }
     setLoading(false);
@@ -82,11 +87,15 @@ export const AuthProvider = ({ children }) => {
     if (data.jwt) {
       localStorage.setItem("jwt", data.jwt);
       localStorage.setItem("role", data.role);
+      if (data.userId) {
+        localStorage.setItem("userId", data.userId);
+      }
 
       const userFromToken = getUserFromToken(data.jwt);
       const userObj = {
         ...userFromToken,
         role: data.role,
+        id: data.userId,
       };
       // Minimal user object storage if needed, mainly for role persistence if we don't decode on load
       localStorage.setItem("user", JSON.stringify(userObj));
@@ -100,6 +109,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("role");
     localStorage.removeItem("user");
+    localStorage.removeItem("userId");
     setCurrentUser(null);
     setUserRole(null);
   };

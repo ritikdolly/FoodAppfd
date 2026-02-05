@@ -22,4 +22,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/test/setup.js",
   },
+  optimizeDeps: {
+    include: ["react-hot-toast"], // Force optimization
+  },
 });

@@ -43,15 +43,20 @@ const router = createBrowserRouter([
     children: [
       {
         path: "customer",
-        element: <PrivateRoute allowedRoles={["ROLE_CUSTOMER", "CUSTOMER"]} />,
+        element: <PrivateRoute allowedRoles={["ROLE_CUSTOMER"]} />,
         children: [
-          { path: "cart", element: <CartPage /> },
-          { path: "placeOrder", element: <CheckoutPage /> },
-          { path: "profile", element: <ProfilePage /> },
-          { path: "favorites", element: <FavoritesPage /> },
-          { path: "addresses", element: <AddressPage /> },
-          { path: "orders", element: <OrdersPage /> },
-          { path: "order-tracking/:id", element: <OrderTrackingPage /> },
+          {
+            element: <MainLayout />,
+            children: [
+              { path: "cart", element: <CartPage /> },
+              { path: "placeOrder", element: <CheckoutPage /> },
+              { path: "profile", element: <ProfilePage /> },
+              { path: "favorites", element: <FavoritesPage /> },
+              { path: "addresses", element: <AddressPage /> },
+              { path: "orders", element: <OrdersPage /> },
+              { path: "order-tracking/:id", element: <OrderTrackingPage /> },
+            ],
+          },
         ],
       },
 
