@@ -50,7 +50,7 @@ export const OrderList = () => {
             className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
           >
             <div
-              className="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors"
+              className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() =>
                 setExpandedOrderId(
                   expandedOrderId === order.id ? null : order.id,
@@ -65,7 +65,7 @@ export const OrderList = () => {
                   Total: ${order.total} • {order.items?.length || 0} Items
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
                 <div onClick={(e) => e.stopPropagation()}>
                   <OrderStatusDropdown
                     status={order.status}

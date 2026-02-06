@@ -12,6 +12,7 @@ import { Button } from "../ui/Button";
 export const DesktopActions = ({
   cartCount = 0,
   isLoggedIn = true,
+  isAdmin = false,
   user = { name: "Ritik", initials: "RK" },
   onLogin,
   onSignup,
@@ -100,6 +101,16 @@ export const DesktopActions = ({
               <ShoppingBag className="w-4 h-4" />
               My Orders
             </button>
+
+            {isAdmin && (
+              <button
+                onClick={() => navigate("/auth/admin/dashboard")}
+                className="w-full px-4 py-3 flex items-center gap-3 text-sm hover:bg-orange-50 text-orange-600 text-left font-medium"
+              >
+                <Settings className="w-4 h-4" />
+                Admin Panel
+              </button>
+            )}
 
             <button
               onClick={() => navigate("/auth/customer/profile")}

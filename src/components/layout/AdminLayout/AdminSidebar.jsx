@@ -8,7 +8,11 @@ import {
   MessageSquare,
 } from "lucide-react";
 
+import { useAuth } from "../../../context/AuthContext";
+
 export const AdminSidebar = ({ open, onClose }) => {
+  const { currentUser } = useAuth();
+
   const linkClass = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium mb-1 ${
       isActive
@@ -50,7 +54,7 @@ export const AdminSidebar = ({ open, onClose }) => {
 
         <nav className="flex-1 px-4 py-4">
           <NavLink
-            to="/admin"
+            to="/auth/admin"
             end
             className={linkClass}
             onClick={() => onClose()}
@@ -60,7 +64,7 @@ export const AdminSidebar = ({ open, onClose }) => {
           </NavLink>
 
           <NavLink
-            to="/admin/food"
+            to="/auth/admin/food"
             className={linkClass}
             onClick={() => onClose()}
           >
@@ -69,7 +73,7 @@ export const AdminSidebar = ({ open, onClose }) => {
           </NavLink>
 
           <NavLink
-            to="/admin/orders"
+            to="/auth/admin/orders"
             className={linkClass}
             onClick={() => onClose()}
           >
@@ -78,7 +82,7 @@ export const AdminSidebar = ({ open, onClose }) => {
           </NavLink>
 
           <NavLink
-            to="/admin/offers"
+            to="/auth/admin/offers"
             className={linkClass}
             onClick={() => onClose()}
           >
@@ -87,7 +91,7 @@ export const AdminSidebar = ({ open, onClose }) => {
           </NavLink>
 
           <NavLink
-            to="/admin/reviews"
+            to="/auth/admin/reviews"
             className={linkClass}
             onClick={() => onClose()}
           >
@@ -99,11 +103,15 @@ export const AdminSidebar = ({ open, onClose }) => {
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="w-8 h-8 rounded-full bg-linear-to-br from-[#FF4B2B] to-[#FF416C] flex items-center justify-center font-bold">
-              A
+              {currentUser?.email
+                ? currentUser.email.charAt(0).toUpperCase()
+                : "A"}
             </div>
             <div className="text-sm">
-              <p className="font-medium">Admin User</p>
-              <p className="text-xs text-gray-500">admin@plh.com</p>
+              <p className="font-medium">{currentUser?.name || "Admin User"}</p>
+              <p className="text-xs text-gray-500">
+                {currentUser?.email || "admin@example.com"}
+              </p>
             </div>
           </div>
         </div>

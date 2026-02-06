@@ -1,6 +1,9 @@
 import { Search, Bell, LogOut, Menu } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
 
 export const AdminHeader = ({ onMenuClick }) => {
+  const { logout } = useAuth();
+
   return (
     <header className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200/50 px-4 md:px-8 py-4 flex justify-between items-center">
       <div className="flex items-center gap-4">
@@ -30,7 +33,10 @@ export const AdminHeader = ({ onMenuClick }) => {
 
         <div className="h-6 w-px bg-gray-200"></div>
 
-        <button className="flex items-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors group">
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors group"
+        >
           <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Logout
         </button>

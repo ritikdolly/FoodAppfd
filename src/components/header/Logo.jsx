@@ -13,7 +13,7 @@ export const Logo = () => {
         <UtensilsCrossed className="w-6 h-6 text-white" />
       </div>
 
-      <span className="hidden sm:block text-2xl font-bold text-[#2D3436] tracking-tight">
+      <span className="hidden sm:block text-2xl font-bold text-[#2D3436] tracking-tight hover:text-[#FF4B2B] transition-colors">
         Prajapati<span className="text-[#FF4B2B]">Line</span>Hotel
       </span>
 

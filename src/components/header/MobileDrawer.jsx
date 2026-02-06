@@ -7,6 +7,7 @@ export const MobileDrawer = ({
   onClose,
   links,
   isLoggedIn = false,
+  isAdmin = false,
   user,
   onLogin,
   onLogout,
@@ -56,7 +57,19 @@ export const MobileDrawer = ({
             </a>
           ))}
 
-          {/* Account */}
+          {/* Admin Link */}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                navigate("/auth/admin/dashboard");
+                onClose();
+              }}
+              className="w-full text-left px-4 py-3 rounded-lg bg-orange-50 text-orange-600 font-medium hover:bg-orange-100 transition-colors"
+            >
+              Admin Panel
+            </button>
+          )}
+
           {/* Account Section */}
           <div className="border-t border-gray-100 pt-6 mt-2">
             {!isLoggedIn ? (

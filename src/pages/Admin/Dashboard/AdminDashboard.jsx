@@ -48,12 +48,12 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
         <select
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-[#FF4B2B]/50"
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-[#FF4B2B]/50 w-full sm:w-auto"
         >
           <option value="all">All Time</option>
           <option value="daily">Today</option>
@@ -63,7 +63,7 @@ export const AdminDashboard = () => {
         </select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((item, index) => (
           <div
             key={index}

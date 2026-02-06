@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ProductRating } from "./ProductRating";
+
 import { useCart } from "../../context/CartContext";
 import { Button } from "../ui/Button"; // Import Button
 import { Card } from "../ui/Card"; // Import Card
@@ -13,21 +13,16 @@ export const ProductCard = ({ product }) => {
   // Let's keep it simple: Heart in Details view is implemented. Heart in List view is bonus but requires fetching user favs for ALL products.
 
   return (
-    <Card className="p-0 overflow-hidden group h-full flex flex-col hover:shadow-xl transition-shadow duration-300 border-border/50">
+    <Card className="p-0 overflow-hidden group h-full flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/50">
       {product.id ? (
         <Link
           to={`/product/${product.id}`}
           className="block relative overflow-hidden"
         >
-          <div className="absolute top-3 right-3 z-10">
-            <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm">
-              {product.time || "30 min"}
-            </span>
-          </div>
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-56 rounded-xl object-cover transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "https://placehold.co/600x400?text=No+Image";
@@ -37,11 +32,6 @@ export const ProductCard = ({ product }) => {
         </Link>
       ) : (
         <div className="block relative overflow-hidden">
-          <div className="absolute top-3 right-3 z-10">
-            <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm">
-              {product.time || "30 min"}
-            </span>
-          </div>
           <img
             src={product.imageUrl}
             alt={product.name}
@@ -71,8 +61,6 @@ export const ProductCard = ({ product }) => {
             ₹{product.price}
           </span>
         </div>
-
-        <ProductRating rating={product.rating} />
 
         <p className="text-sm text-gray-500 line-clamp-2">
           {product.comments || product.description || product.quantity}

@@ -1,4 +1,4 @@
 export const navLinks = [
-  { name: "Home", href: "/", active: true },
-  { name: "Menu", href: "/#menu" },
+  { name: "Home", href: "/" },
+  { name: "Menu", href: "/menu" },
 ];

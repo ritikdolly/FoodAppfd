@@ -1,4 +1,4 @@
-export const Modal = ({ open, onClose, children }) => {
+export const Modal = ({ open, onClose, children, className = "" }) => {
   if (!open) return null;
 
   return (
@@ -10,10 +10,12 @@ export const Modal = ({ open, onClose, children }) => {
       />
 
       {/* Modal Box */}
-      <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 z-10 animate-[scale-in_0.2s_ease-out]">
+      <div
+        className={`relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 z-10 animate-[scale-in_0.2s_ease-out] ${className}`}
+      >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
           ✕
         </button>

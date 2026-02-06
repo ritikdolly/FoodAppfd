@@ -2,7 +2,7 @@ import { Button } from "../../components/ui/Button";
 
 export const Hero = () => {
   return (
-    <section className="relative overflow-hidden pt-32 pb-20 bg-linear-to-br from-orange-50/50 to-white">
+    <section className="relative max-w-7xl mx-auto overflow-hidden pt-32 pb-20 bg-linear-to-br from-orange-50/50 to-white">
       {/* Background shapes */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-orange-100/30 to-transparent rounded-bl-[100px] -z-10" />
 

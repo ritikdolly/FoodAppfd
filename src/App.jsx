@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import { MainLayout } from "./components/layout/MainLayout/MainLayout";
 import { Home } from "./pages/Home/Home";
+import { MenuPage } from "./pages/Menu/MenuPage";
 import { ProductPage } from "./pages/ProductPage";
 import { CartPage } from "./pages/Cart/CartPage";
 import { CartProvider } from "./context/CartContext";
@@ -25,14 +26,15 @@ import { SignUpModal } from "./components/auth/SignUpModal";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const router = createBrowserRouter([
-  { path: "/login", element: <SignInModal /> },
-  { path: "/signup", element: <SignUpModal /> },
+  // { path: "/login", element: <SignInModal /> },
+  // { path: "/signup", element: <SignUpModal /> },
   // for user layout
   {
     path: "/",
     element: <MainLayout />,
     children: [
       { index: true, element: <Home /> },
+      { path: "/menu", element: <MenuPage /> },
       { path: "/product/:id", element: <ProductPage /> },
       { path: "/invoice/:id", element: <InvoicePage /> },
       { path: "/help", element: <HelpPage /> },

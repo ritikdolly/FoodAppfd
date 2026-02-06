@@ -41,7 +41,8 @@ export const ProductInfo = ({ product }) => {
     <>
       <div className="flex justify-between items-start">
         <h1 className="text-3xl font-bold">{product.name}</h1>
-        <button
+
+        {/* <button
           onClick={toggleFavorite}
           className={`p-2 rounded-full transition-colors ${
             isFavorite
@@ -50,14 +51,7 @@ export const ProductInfo = ({ product }) => {
           }`}
         >
           <Heart className={`w-6 h-6 ${isFavorite ? "fill-current" : ""}`} />
-        </button>
-      </div>
-
-      <div className="flex items-center gap-4 mt-2">
-        <span className="text-green-600 font-medium">⭐ {product.rating}</span>
-        <span className="text-gray-500">
-          ({product.reviews?.length || 0} reviews)
-        </span>
+        </button> */}
       </div>
 
       <p className="text-2xl font-bold text-orange-600 mt-4">
