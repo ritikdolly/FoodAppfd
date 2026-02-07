@@ -38,7 +38,7 @@ export const FoodVerticalCard = ({ product }) => {
           <span className="text-lg font-bold">₹{product.price}</span>
           <Button
             onClick={() => addToCart(product)}
-            className="rounded-full w-8 h-8 p-0 flex items-center justify-center bg-primary text-white hover:bg-primary/90 shadow-md hover:scale-105 active:scale-95 transition-all"
+            className="rounded-full w-8 h-8 !p-0 flex items-center justify-center bg-primary text-white hover:bg-primary/90 shadow-md hover:scale-105 active:scale-95 transition-all"
             disabled={!product.availability}
             title="Add to Cart"
           >

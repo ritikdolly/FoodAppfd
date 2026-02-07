@@ -14,6 +14,15 @@ client.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = crypto.randomUUID
+        ? crypto.randomUUID()
+        : Date.now().toString(36) + Math.random().toString(36).substr(2);
+      localStorage.setItem("sessionId", sessionId);
+    }
+    config.headers["X-Session-Id"] = sessionId;
     return config;
   },
   (error) => {

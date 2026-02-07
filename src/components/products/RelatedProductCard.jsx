@@ -33,8 +33,7 @@ export const RelatedProductCard = ({ product }) => {
 
             <Button
               onClick={() => addToCart(product)}
-              size="sm"
-              className="w-7 h-7 p-0 rounded-full bg-gray-100 text-gray-600 hover:bg-primary hover:text-white flex items-center justify-center shadow-none transition-colors"
+              className="w-7 h-7 !p-0 rounded-full bg-none bg-gray-100 text-gray-600 hover:bg-primary hover:text-white flex items-center justify-center shadow-none transition-colors"
               disabled={!product.availability}
               title="Add to Cart"
             >
