@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Avatar } from "../ui/Avatar";
 import { X, Heart, MapPin, User, LogOut, ShoppingBag } from "lucide-react";
 
 export const MobileDrawer = ({
@@ -84,7 +85,7 @@ export const MobileDrawer = ({
                 {/* User Info */}
                 <div className="flex items-center gap-3 px-2 mb-4">
                   <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-lg">
-                    {user?.initials || "U"}
+                    <Avatar user={user} />
                   </div>
                   <div>
                     <p className="font-bold text-gray-800">

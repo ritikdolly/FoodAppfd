@@ -23,15 +23,7 @@ export const Header = () => {
   // Derived Auth State
   const isLoggedIn = !!currentUser;
   const isAdmin = currentUser?.role === "ROLE_ADMIN"; // Assuming role is stored here
-  const user = {
-    name:
-      currentUser?.displayName || currentUser?.email?.split("@")[0] || "User",
-    initials: (currentUser?.displayName || currentUser?.email || "U")
-      .slice(0, 2)
-      .toUpperCase(),
-    email: currentUser?.email,
-    role: currentUser?.role,
-  };
+  const user = currentUser;
 
   const handleLogin = () => {
     // Auth state handled by context, just close modals
@@ -68,7 +60,6 @@ export const Header = () => {
           ${scrolled ? "shadow-md py-2" : "py-3 md:py-4 shadow-sm"}
         `}
       >
-      
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
           <Logo />
 

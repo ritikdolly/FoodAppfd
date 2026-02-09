@@ -8,8 +8,10 @@ import {
   updateAddress,
   deleteAddress,
 } from "../../api/address";
+import { useAuth } from "../../context/AuthContext";
 
 export const AddressSection = ({ onSelect }) => {
+  const { currentUser } = useAuth();
   const [selectedId, setSelectedId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -23,12 +25,13 @@ export const AddressSection = ({ onSelect }) => {
     state: "",
     pin: "",
     country: "India",
+    mobile: "",
     type: "Home",
   });
 
   const handleSelect = (addr) => {
     setSelectedId(addr.id);
-    const fullAddr = `${addr.street}, ${addr.city}, ${addr.district}, ${addr.state} - ${addr.pin}, ${addr.country}`;
+    const fullAddr = `${addr.street}, ${addr.city}, ${addr.district}, ${addr.state} - ${addr.pin}, ${addr.country}, Phone: ${addr.mobile}`;
     onSelect(fullAddr);
   };
 
@@ -49,6 +52,13 @@ export const AddressSection = ({ onSelect }) => {
     fetchAddresses();
   }, []);
 
+  // Prefill mobile number when modal opens
+  useEffect(() => {
+    if (isModalOpen && !editingId && currentUser?.phone) {
+      setFormData((prev) => ({ ...prev, mobile: currentUser.phone }));
+    }
+  }, [isModalOpen, editingId, currentUser]);
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -63,6 +73,7 @@ export const AddressSection = ({ onSelect }) => {
       state: addr.state,
       pin: addr.pin,
       country: addr.country,
+      mobile: addr.mobile || "",
       type: addr.type,
     });
     setIsModalOpen(true);
@@ -71,9 +82,19 @@ export const AddressSection = ({ onSelect }) => {
   const handleDeleteClick = async (id) => {
     if (window.confirm("Are you sure you want to delete this address?")) {
       try {
-        await deleteAddress(id);
-        const data = await getAddresses();
-        setSavedAddresses(data);
+        // Try to delete from backend if it exists there
+        try {
+          await deleteAddress(id);
+        } catch (e) {
+          // Ignore error if it was a temp local address
+        }
+
+        // Update local state regardless
+        const updatedAddresses = savedAddresses.filter(
+          (addr) => addr.id !== id,
+        );
+        setSavedAddresses(updatedAddresses);
+
         if (selectedId === id) {
           setSelectedId("");
           onSelect("");
@@ -85,27 +106,21 @@ export const AddressSection = ({ onSelect }) => {
   };
 
   const handleSaveAddress = async () => {
-    if (formData.street && formData.city && formData.pin) {
+    if (formData.street && formData.city && formData.pin && formData.mobile) {
       try {
         if (editingId) {
-          await updateAddress(editingId, formData);
+          // Update existing address
+          const updatedAddress = await updateAddress(editingId, formData);
+          const updatedList = savedAddresses.map((addr) =>
+            addr.id === editingId ? updatedAddress : addr,
+          );
+          setSavedAddresses(updatedList);
+          handleSelect(updatedAddress);
         } else {
-          await addAddress(formData);
-        }
-
-        const data = await getAddresses();
-        setSavedAddresses(data);
-
-        // If adding new, select it. If editing, it stays selected if it was.
-        if (!editingId) {
-          const newAddr = data[data.length - 1];
-          if (newAddr) {
-            handleSelect(newAddr);
-          }
-        } else if (selectedId === editingId) {
-          // Re-select to update display text
-          const updatedAddr = data.find((a) => a.id === editingId);
-          if (updatedAddr) handleSelect(updatedAddr);
+          // Add new address
+          const newAddress = await addAddress(formData);
+          setSavedAddresses([...savedAddresses, newAddress]);
+          handleSelect(newAddress);
         }
 
         setIsModalOpen(false);
@@ -117,13 +132,15 @@ export const AddressSection = ({ onSelect }) => {
           state: "",
           pin: "",
           country: "India",
+          mobile: "",
           type: "Home",
         });
       } catch (error) {
+        console.error("Failed to save address:", error);
         alert("Failed to save address");
       }
     } else {
-      alert("Please fill in Street, City and PIN Code");
+      alert("Please fill in Street, City, PIN Code and Mobile info");
     }
   };
 
@@ -134,7 +151,6 @@ export const AddressSection = ({ onSelect }) => {
         <h2 className="text-lg font-bold text-gray-800">Delivery Address</h2>
       </div>
 
-      {/* Saved Addresses List */}
       {/* Saved Addresses List */}
       <div className="space-y-3">
         {Array.isArray(savedAddresses) &&
@@ -158,9 +174,7 @@ export const AddressSection = ({ onSelect }) => {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-bold text-gray-900">{addr.type}</span>
-                    <span className="text-sm text-gray-500">
-                      | {addr.name || "User"}
-                    </span>
+                   
                   </div>
                   <p className="text-sm text-gray-600 line-clamp-1">
                     {addr.street}, {addr.city}, {addr.district}
@@ -172,7 +186,7 @@ export const AddressSection = ({ onSelect }) => {
                     </span>
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Phone: {addr.phone || "N/A"}
+                    Phone: {addr.mobile || addr.phone || "N/A"}
                   </p>
 
                   {/* Edit/Delete Actions */}
@@ -226,6 +240,7 @@ export const AddressSection = ({ onSelect }) => {
               state: "",
               pin: "",
               country: "India",
+              mobile: "",
               type: "Home",
             });
             setIsModalOpen(true);
@@ -243,7 +258,7 @@ export const AddressSection = ({ onSelect }) => {
       {/* Address Modal */}
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h2 className="text-xl font-bold mb-4 text-gray-900">
-          Add New Address
+          {editingId ? "Edit Address" : "Add New Address"}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto px-1">
           <div className="md:col-span-2">
@@ -261,6 +276,20 @@ export const AddressSection = ({ onSelect }) => {
               <option value="Other">Other</option>
             </select>
           </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Mobile Number
+            </label>
+            <input
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleFormChange}
+              placeholder="Mobile Number"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-[#FF4B2B] focus:ring-1 focus:ring-[#FF4B2B]"
+            />
+          </div>
+
           <div className="md:col-span-2">
             <label className="block text-xs font-medium text-gray-700 mb-1">
               Street Address
@@ -340,8 +369,15 @@ export const AddressSection = ({ onSelect }) => {
           </div>
         </div>
 
-        <div className="mt-6">
-          <Button onClick={handleSaveAddress} className="w-full">
+        <div className="mt-6 flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsModalOpen(false)}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleSaveAddress} className="flex-1">
             Save & Deliver Here
           </Button>
         </div>

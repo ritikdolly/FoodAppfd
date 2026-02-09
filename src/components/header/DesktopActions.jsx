@@ -8,12 +8,13 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
+import { Avatar } from "../ui/Avatar";
 
 export const DesktopActions = ({
   cartCount = 0,
   isLoggedIn = true,
   isAdmin = false,
-  user = { name: "Ritik", initials: "RK" },
+  user = {},
   onLogin,
   onSignup,
   onLogout,
@@ -23,7 +24,10 @@ export const DesktopActions = ({
   return (
     <div className="hidden md:flex items-center gap-3 border-l pl-6">
       {/* Favorites */}
-      <button className="p-2 hover:bg-gray-100 rounded-full">
+      <button
+        onClick={() => navigate("/auth/customer/favorites")}
+        className="p-2 hover:bg-gray-100 rounded-full"
+      >
         <Heart className="w-5 h-5" />
       </button>
 
@@ -69,11 +73,9 @@ export const DesktopActions = ({
               hover:bg-gray-50 transition
             "
           >
-            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-600">
-              {user.initials}
-            </div>
+            <Avatar user={user} />
             <span className="hidden lg:block text-sm font-medium">
-              {user.name}
+              {user.fullName || user.name || "User"}
             </span>
           </div>
 
@@ -83,7 +85,7 @@ export const DesktopActions = ({
               absolute right-0 top-full mt-2 w-48 bg-white border rounded-xl
               shadow-[rgba(17,17,26,0.1)_0px_0px_16px]
               opacity-0 invisible group-hover:opacity-100 group-hover:visible
-              transition-all
+              transition-all z-50
             "
           >
             <button

@@ -30,26 +30,43 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Check local storage for existing session
-    const jwt = localStorage.getItem("jwt");
-    const role = localStorage.getItem("role");
-    const userId = localStorage.getItem("userId");
+    const initAuth = async () => {
+      // Check local storage for existing session
+      const jwt = localStorage.getItem("jwt");
+      const role = localStorage.getItem("role");
+      const userId = localStorage.getItem("userId");
 
-    if (jwt) {
-      const userFromToken = getUserFromToken(jwt);
-      setUserRole(role || "ROLE_CUSTOMER");
+      if (jwt) {
+        const userFromToken = getUserFromToken(jwt);
+        setUserRole(role || "ROLE_CUSTOMER");
 
-      if (userFromToken) {
-        setCurrentUser({
-          ...userFromToken,
+        let baseUser = {
           role: role || "ROLE_CUSTOMER",
           id: userId,
-        });
-      } else {
-        setCurrentUser({ role: role || "ROLE_CUSTOMER", id: userId });
+        };
+
+        if (userFromToken) {
+          baseUser = { ...baseUser, ...userFromToken };
+        }
+
+        // Fetch full profile if we have an ID
+        if (userId) {
+          try {
+            // Dynamic import to avoid circular dependency if api/user imports client which uses interceptor
+            const { getUser } = await import("../api/user");
+            const fullUser = await getUser(userId);
+            setCurrentUser({ ...baseUser, ...fullUser });
+          } catch (err) {
+            console.error("Failed to fetch user profile", err);
+            setCurrentUser(baseUser);
+          }
+        } else {
+          setCurrentUser(baseUser);
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (email, password) => {
@@ -83,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const handleAuthSuccess = (data) => {
+  const handleAuthSuccess = async (data) => {
     if (data.jwt) {
       localStorage.setItem("jwt", data.jwt);
       localStorage.setItem("role", data.role);
@@ -92,11 +109,23 @@ export const AuthProvider = ({ children }) => {
       }
 
       const userFromToken = getUserFromToken(data.jwt);
-      const userObj = {
+      let userObj = {
         ...userFromToken,
         role: data.role,
         id: data.userId,
       };
+
+      // Fetch full profile immediately
+      if (data.userId) {
+        try {
+          const { getUser } = await import("../api/user");
+          const fullUser = await getUser(data.userId);
+          userObj = { ...userObj, ...fullUser };
+        } catch (error) {
+          console.error("Failed to fetch user profile on login", error);
+        }
+      }
+
       // Minimal user object storage if needed, mainly for role persistence if we don't decode on load
       localStorage.setItem("user", JSON.stringify(userObj));
 

@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
-import { Plus, MapPin, Edit2, Trash2, Home, Briefcase } from "lucide-react";
+import {
+  Plus,
+  MapPin,
+  Edit2,
+  Trash2,
+  Home,
+  Briefcase,
+  Phone,
+} from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Modal } from "../../components/ui/Modal";
 import { addAddress, getAddresses } from "../../api/address";
+import { useAuth } from "../../context/AuthContext";
 
 export const AddressPage = () => {
+  const { currentUser } = useAuth();
   const [addresses, setAddresses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,6 +25,7 @@ export const AddressPage = () => {
     state: "",
     pin: "",
     country: "India",
+    mobile: "",
     type: "Home",
   });
 
@@ -31,11 +42,22 @@ export const AddressPage = () => {
     fetchAddresses();
   }, []);
 
+  // Prefill mobile number when modal opens
+  useEffect(() => {
+    if (isModalOpen && currentUser?.phone) {
+      setFormData((prev) => ({ ...prev, mobile: currentUser.phone }));
+    }
+  }, [isModalOpen, currentUser]);
+
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSaveAddress = async () => {
+    if (!formData.mobile) {
+      alert("Mobile number is required");
+      return;
+    }
     try {
       await addAddress(formData);
       setIsModalOpen(false);
@@ -48,6 +70,7 @@ export const AddressPage = () => {
         state: "",
         pin: "",
         country: "India",
+        mobile: "",
         type: "Home",
       });
     } catch (error) {
@@ -91,24 +114,33 @@ export const AddressPage = () => {
               </div>
 
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="font-bold text-lg">{addr.type}</h3>
-                  <span className="text-gray-400 text-sm">|</span>
-                  <span className="font-medium text-gray-900">{addr.name}</span>
-                  <span className="text-gray-500 text-sm">{addr.phone}</span>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-lg text-gray-900">
+                    {addr.type}
+                  </h3>
+                  {addr.mobile && (
+                    <span className="text-gray-600 text-sm flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                      <Phone className="w-3.5 h-3.5" />
+                      <span className="font-medium">{addr.mobile}</span>
+                    </span>
+                  )}
                 </div>
 
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  {addr.street}, {addr.city}, {addr.district}, {addr.state} -{" "}
-                  {addr.pin}
+                <p className="text-gray-600 leading-relaxed mb-4 text-sm">
+                  {addr.street}
+                  <br />
+                  {addr.city}, {addr.district}
+                  <br />
+                  {addr.state} -{" "}
+                  <span className="font-medium text-gray-900">{addr.pin}</span>
                 </p>
 
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-[#FF4B2B] transition-colors">
-                    <Edit2 className="w-4 h-4" /> Edit
+                <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                  <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#FF4B2B] transition-colors">
+                    <Edit2 className="w-3.5 h-3.5" /> Edit
                   </button>
-                  <button className="flex items-center gap-1 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
-                    <Trash2 className="w-4 h-4" /> Delete
+                  <button className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
                   </button>
 
                   {!addr.isDefault && (
@@ -148,6 +180,20 @@ export const AddressPage = () => {
               <option value="Other">Other</option>
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Mobile Number
+            </label>
+            <input
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleFormChange}
+              placeholder="Mobile Number"
+              className="w-full border p-2 rounded"
+            />
+          </div>
+
           <input
             name="street"
             value={formData.street}
@@ -155,34 +201,38 @@ export const AddressPage = () => {
             placeholder="Street"
             className="w-full border p-2 rounded"
           />
-          <input
-            name="city"
-            value={formData.city}
-            onChange={handleFormChange}
-            placeholder="City"
-            className="w-full border p-2 rounded"
-          />
-          <input
-            name="district"
-            value={formData.district}
-            onChange={handleFormChange}
-            placeholder="District"
-            className="w-full border p-2 rounded"
-          />
-          <input
-            name="state"
-            value={formData.state}
-            onChange={handleFormChange}
-            placeholder="State"
-            className="w-full border p-2 rounded"
-          />
-          <input
-            name="pin"
-            value={formData.pin}
-            onChange={handleFormChange}
-            placeholder="PIN Code"
-            className="w-full border p-2 rounded"
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              name="city"
+              value={formData.city}
+              onChange={handleFormChange}
+              placeholder="City"
+              className="w-full border p-2 rounded"
+            />
+            <input
+              name="district"
+              value={formData.district}
+              onChange={handleFormChange}
+              placeholder="District"
+              className="w-full border p-2 rounded"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              name="state"
+              value={formData.state}
+              onChange={handleFormChange}
+              placeholder="State"
+              className="w-full border p-2 rounded"
+            />
+            <input
+              name="pin"
+              value={formData.pin}
+              onChange={handleFormChange}
+              placeholder="PIN Code"
+              className="w-full border p-2 rounded"
+            />
+          </div>
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="outline" onClick={() => setIsModalOpen(false)}>
