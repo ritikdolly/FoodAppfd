@@ -21,12 +21,15 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const { currentUser } = useAuth(); // Re-fetch cart when user changes
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   const fetchCart = useCallback(async () => {
+    if (!currentUser) {
+      setCartItems([]);
+      return;
+    }
     try {
       const cart = await getCart();
       if (cart && cart.items) {
-       
-
         // Quick fix in frontend: calculate unit price.
         const mappedItems = cart.items.map((item) => ({
           id: item.foodId,
@@ -41,21 +44,24 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Failed to fetch cart", error);
-      // toast.error("Failed to load cart"); // Maybe too noisy on load
     }
-  }, []); // Empty dependency array because getCart and setCartItems are stable
+  }, [currentUser]); // currentUser is a dependency
 
   useEffect(() => {
     fetchCart();
-  }, [currentUser, fetchCart]); // Refresh when user logs in/out, and fetchCart is stable
+  }, [currentUser, fetchCart]);
 
   const addToCart = async (product) => {
+    if (!currentUser) {
+      toast.error("Please login to add items to cart");
+      return;
+    }
     try {
-      // Optimistic update or wait? Wait is safer for consistency.
       await apiAddToCart({ foodId: product.id, quantity: 1 });
       toast.success("Added to cart");
       fetchCart();
     } catch (error) {
+      console.error("Add to cart error:", error);
       if (
         error &&
         typeof error === "string" &&
@@ -69,7 +75,11 @@ export const CartProvider = ({ children }) => {
       ) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to add to cart");
+        const msg =
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to add to cart";
+        toast.error(msg);
       }
     }
   };

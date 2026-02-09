@@ -34,7 +34,7 @@ export const CartSummary = ({ items }) => {
 
       <Button
         className="w-full py-4 text-lg rounded-xl shadow-lg shadow-[#FF4B2B]/20"
-        onClick={() => navigate("/placeOrder")}
+        onClick={() => navigate("/auth/customer/placeOrder")}
         disabled={!items.length}
       >
         Proceed to Checkout

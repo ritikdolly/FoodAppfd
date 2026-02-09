@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createOrder } from "../../api/orders";
-import { createPaymentOrder } from "../../api/payment";
+import { createPaymentOrder, verifyPayment } from "../../api/payment";
+import { toast } from "react-hot-toast";
 import { useCart } from "../../context/CartContext";
 import { OrderItems } from "../../components/checkout/OrderItems";
 import { AddressSection } from "../../components/checkout/AddressSection";
@@ -40,23 +41,36 @@ export const CheckoutPage = () => {
         const order = await createPaymentOrder(totalAmount);
 
         const options = {
-          key: "rzp_test_YOUR_KEY_ID", // Replace with your Key ID
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           amount: order.amount,
-          currency: "INR",
+          currency: order.currency,
           name: "Food App",
           description: "Order Payment",
-          order_id: order.id, // This is the order_id created in the backend
+          order_id: order.razorpayOrderId,
           handler: async function (response) {
-            // Payment successful, now create the order in DB
-            orderPayload.paymentId = response.razorpay_payment_id;
-            orderPayload.status = "Paid"; // Or "Processing" depending on flow
+            try {
+              // Verify payment on backend
+              await verifyPayment(
+                response.razorpay_order_id,
+                response.razorpay_payment_id,
+                response.razorpay_signature,
+              );
 
-            await createOrder(orderPayload);
-            clearCart();
-            navigate("/orders");
+              // Payment successful, now create the order in DB
+              orderPayload.paymentId = response.razorpay_payment_id;
+              orderPayload.status = "Paid";
+
+              await createOrder(orderPayload);
+              clearCart();
+              navigate("/orders");
+              toast.success("Order Placed Successfully!");
+            } catch (err) {
+              console.error("Verification failed", err);
+              toast.error("Payment verification failed");
+            }
           },
           prefill: {
-            name: "User Name", // valid user name
+            name: "User Name", // TODO: Get from Auth Context
             email: "user@example.com",
             contact: "9999999999",
           },
@@ -67,7 +81,7 @@ export const CheckoutPage = () => {
 
         const rzp1 = new window.Razorpay(options);
         rzp1.on("payment.failed", function (response) {
-          alert("Payment Failed: " + response.error.description);
+          toast.error("Payment Failed: " + response.error.description);
         });
         rzp1.open();
       } else {
@@ -75,9 +89,10 @@ export const CheckoutPage = () => {
         await createOrder(orderPayload);
         clearCart();
         navigate("/orders");
+        toast.success("Order Placed Successfully!");
       }
     } catch (error) {
-      alert("Failed to place order. Please try again.");
+      toast.error("Failed to place order. Please try again.");
       console.error("Order placement failed", error);
     }
   };

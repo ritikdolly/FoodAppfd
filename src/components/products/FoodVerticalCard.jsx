@@ -5,7 +5,8 @@ import { useCart } from "../../context/CartContext";
 import { Plus } from "lucide-react";
 
 export const FoodVerticalCard = ({ product }) => {
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
+  const isInCart = cartItems.some((item) => item.id === product.id);
 
   return (
     <Card className="overflow-hidden group flex flex-col h-full border-0 shadow-sm hover:shadow-md transition-shadow duration-300 bg-white rounded-2xl">
@@ -38,9 +39,13 @@ export const FoodVerticalCard = ({ product }) => {
           <span className="text-lg font-bold">₹{product.price}</span>
           <Button
             onClick={() => addToCart(product)}
-            className="rounded-full w-8 h-8 !p-0 flex items-center justify-center bg-primary text-white hover:bg-primary/90 shadow-md hover:scale-105 active:scale-95 transition-all"
-            disabled={!product.availability}
-            title="Add to Cart"
+            className={`rounded-full w-8 h-8 !p-0 flex items-center justify-center transition-all shadow-md ${
+              isInCart
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95"
+            }`}
+            disabled={!product.availability || isInCart}
+            title={isInCart ? "Already in Cart" : "Add to Cart"}
           >
             <Plus size={18} strokeWidth={3} className="text-white" />
           </Button>
