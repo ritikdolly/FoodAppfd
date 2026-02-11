@@ -14,6 +14,7 @@ import { OffersPage } from "./pages/Admin/Offers/OffersPage";
 import { FoodPage } from "./pages/Admin/Food/FoodPage";
 import { AdminLayout } from "./components/layout/AdminLayout/AdminLayout";
 import { AdminDashboard } from "./pages/Admin/Dashboard/AdminDashboard";
+import { Invoice } from "./components/admin/Invoice";
 import { ProfilePage } from "./pages/User/ProfilePage";
 import { FavoritesPage } from "./pages/User/FavoritesPage";
 import { AddressPage } from "./pages/User/AddressPage";
@@ -68,6 +69,7 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <AdminDashboard /> },
               { path: "orders", element: <OrderList /> },
+              { path: "orders/invoice/:id", element: <Invoice /> },
               { path: "food", element: <FoodPage /> },
               { path: "offers", element: <OffersPage /> },
               { path: "reviews", element: <ReviewList /> },

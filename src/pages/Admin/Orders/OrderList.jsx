@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import { getAllOrders, updateOrderStatus } from "../../../api/orders";
 import { format } from "date-fns";
-import { ChevronDown, Search, CheckCircle, XCircle, Clock } from "lucide-react";
+import {
+  ChevronDown,
+  Search,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Eye,
+} from "lucide-react";
 import toast from "react-hot-toast";
+import { OrderDetailsModal } from "../../../components/admin/OrderDetailsModal";
 
 export const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -10,6 +18,8 @@ export const OrderList = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const STATUS_COLORS = {
     PENDING: "bg-yellow-100 text-yellow-800",
@@ -50,7 +60,7 @@ export const OrderList = () => {
       );
       setOrders(sorted);
       setFilteredOrders(sorted);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch orders");
     } finally {
       setLoading(false);
@@ -61,10 +71,21 @@ export const OrderList = () => {
     try {
       const updatedOrder = await updateOrderStatus(orderId, newStatus);
       setOrders(orders.map((o) => (o.id === orderId ? updatedOrder : o)));
+
+      // Also update selected order if open
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder(updatedOrder);
+      }
+
       toast.success(`Order status updated to ${newStatus}`);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update status");
     }
+  };
+
+  const handleViewDetails = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
   };
 
   if (loading) {
@@ -171,14 +192,14 @@ export const OrderList = () => {
                       {order.paymentDetails?.paymentMethod}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 flex items-center gap-2">
                     <div className="relative group">
                       <select
                         value={order.status}
                         onChange={(e) =>
                           handleStatusUpdate(order.id, e.target.value)
                         }
-                        className="px-2 py-1 text-xs border rounded focus:outline-none focus:border-[#FF4B2B] bg-white cursor-pointer"
+                        className="px-2 py-1 text-xs border rounded focus:outline-none focus:border-[#FF4B2B] bg-white cursor-pointer w-28"
                         disabled={
                           order.status === "DELIVERED" ||
                           order.status === "CANCELLED"
@@ -194,6 +215,14 @@ export const OrderList = () => {
                         <option value="CANCELLED">Cancel</option>
                       </select>
                     </div>
+
+                    <button
+                      onClick={() => handleViewDetails(order)}
+                      className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-[#FF4B2B]"
+                      title="View Details"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -211,6 +240,14 @@ export const OrderList = () => {
           </table>
         </div>
       </div>
+
+      {isModalOpen && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => setIsModalOpen(false)}
+          onUpdateStatus={handleStatusUpdate}
+        />
+      )}
     </div>
   );
 };

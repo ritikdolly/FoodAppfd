@@ -1,7 +1,7 @@
 import client from "./client";
 
-export const createPaymentLink = async (orderId) => {
-  const response = await client.post(`/api/payment/${orderId}`);
+export const initiatePayment = async () => {
+  const response = await client.post("/api/payment/initiate");
   return response.data;
 };
 

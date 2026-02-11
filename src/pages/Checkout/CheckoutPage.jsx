@@ -4,7 +4,7 @@ import { AddressSection } from "../../components/checkout/AddressSection";
 import { PaymentSection } from "../../components/checkout/PaymentSection";
 import { Button } from "../../components/ui/Button";
 import { createOrder } from "../../api/orders";
-import { createPaymentLink, verifyPayment } from "../../api/payment";
+import { initiatePayment, verifyPayment } from "../../api/payment";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -21,7 +21,7 @@ export const CheckoutPage = () => {
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
-  const deliveryFee = cartItems.length > 0 ? 40 : 0;
+  const deliveryFee = cartItems.length > 0 && cartTotal < 300 ? 40 : 0;
   const grandTotal = cartTotal + deliveryFee;
 
   // Temporary function until AddressSection is fixed
@@ -37,39 +37,34 @@ export const CheckoutPage = () => {
 
     setLoading(true);
     try {
-      const orderRequest = {
-        shippingAddress: selectedAddress,
-        paymentMethod: paymentMethod,
-        // Backend might need totalAmount if it doesn't calculate it itself from items
-        // But usually backend calculates from DB prices for security.
-        // If backend expects total, add it here: totalAmount: grandTotal
-      };
-
-      const order = await createOrder(orderRequest);
-
       if (paymentMethod === "COD") {
+        const orderRequest = {
+          shippingAddress: selectedAddress,
+          paymentMethod: "COD",
+        };
+        await createOrder(orderRequest);
         clearCart();
         toast.success("Order Placed Successfully!");
         navigate("/auth/customer/orders");
       } else {
         // Online Payment
-        const paymentRes = await createPaymentLink(order.id);
+        const paymentRes = await initiatePayment();
 
+        // paymentRes contains payment_url (order_id), amount, currency
         const options = {
-          key:
-            import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_kX8x8x8x8x8x8x", // Env var
-          amount: order.totalAmount * 100,
-          currency: "INR",
-          name: "Food App",
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: paymentRes.amount,
+          currency: paymentRes.currency,
+          name: "Prajapati Line Hotel",
           description: "Order Payment",
-          order_id: paymentRes.payment_url, // Backend returned orderId in payment_url field
+          order_id: paymentRes.payment_url,
           handler: async function (response) {
             try {
               const verifyReq = {
-                orderId: order.id,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpaySignature: response.razorpay_signature,
+                shippingAddress: selectedAddress,
               };
               await verifyPayment(verifyReq);
               clearCart();
@@ -81,12 +76,9 @@ export const CheckoutPage = () => {
             }
           },
           prefill: {
-            name: order.userName,
-            email: "user@example.com", // Should get from auth context
+            name: "Customer", // We could fetch user name from context if available
+            email: "user@example.com",
             contact: selectedAddress.mobile,
-          },
-          notes: {
-            address: "Razorpay Corporate Office",
           },
           theme: {
             color: "#FF4B2B",

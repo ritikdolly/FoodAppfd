@@ -1,106 +1,44 @@
-// Mock data for restaurant-level reviews
-let REVIEWS_DATA = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    rating: 5,
-    comment:
-      "The delivery was super fast and the food arrived hot! Definitely ordering again.",
-    avatar: "https://i.pravatar.cc/150?u=sarah",
-    date: "2023-10-15",
-    isTrusted: true,
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    rating: 5,
-    comment:
-      "Best service in town. The packaging was eco-friendly which I really appreciate.",
-    avatar: "https://i.pravatar.cc/150?u=michael",
-    date: "2023-10-12",
-    isTrusted: true,
-  },
-  {
-    id: 3,
-    name: "Emily Davis",
-    rating: 4,
-    comment: "Great variety of healthy options. The salad was fresh and crisp.",
-    avatar: "https://i.pravatar.cc/150?u=emily",
-    date: "2023-10-10",
-    isTrusted: true,
-  },
-  {
-    id: 4,
-    name: "David Wilson",
-    rating: 5,
-    comment:
-      "They handled my allergy requirements perfectly. Safe and delicious!",
-    avatar: "https://i.pravatar.cc/150?u=david",
-    date: "2023-10-08",
-    isTrusted: true,
-  },
-  {
-    id: 5,
-    name: "Jessica Taylor",
-    rating: 5,
-    comment:
-      "Love the new menu updates. The vertical scrolling app design is also very smooth.",
-    avatar: "https://i.pravatar.cc/150?u=jessica",
-    date: "2023-10-05",
-    isTrusted: true,
-  },
-  {
-    id: 6,
-    name: "Robert Brown",
-    rating: 3,
-    comment: "Food was good but delivery took a it longer than expected.",
-    avatar: "https://i.pravatar.cc/150?u=robert",
-    date: "2023-10-01",
-    isTrusted: false,
-  },
-];
+import axios from "axios";
+
+// Access the API URL correctly
+const API_URL = "http://localhost:8080/api/customer-reviews";
+
+const getAuthToken = () => localStorage.getItem("jwt");
+
+const getAuthHeader = () => {
+  const token = getAuthToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 export const getReviews = async () => {
-  // Simulate API delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...REVIEWS_DATA]);
-    }, 500);
-  });
+  try {
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching reviews", error);
+    return [];
+  }
 };
 
 export const deleteReview = async (id) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      REVIEWS_DATA = REVIEWS_DATA.filter((r) => r.id !== id);
-      resolve(true);
-    }, 500);
+  const response = await axios.delete(`${API_URL}/${id}`, {
+    headers: getAuthHeader(),
   });
+  return response.data;
 };
 
+// Assuming backend supports toggling trusted or similar logic,
+// if not, we might need to remove this or implement it in backend.
+// For now, removing mock logic but keeping function signature if used.
 export const toggleTrusted = async (id) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      REVIEWS_DATA = REVIEWS_DATA.map((r) =>
-        r.id === id ? { ...r, isTrusted: !r.isTrusted } : r,
-      );
-      resolve(true);
-    }, 300);
-  });
+  // If backend doesn't support this yet, log warning or implement endpoint
+  console.warn("toggleTrusted not fully implemented in backend yet");
+  return true;
 };
 
 export const addReview = async (review) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newReview = {
-        id: REVIEWS_DATA.length + 1,
-        ...review,
-        date: new Date().toISOString().split("T")[0],
-        isTrusted: false, // Default to untrusted
-        avatar: `https://i.pravatar.cc/150?u=${Math.random()}`, // Random avatar for mock
-      };
-      REVIEWS_DATA = [newReview, ...REVIEWS_DATA];
-      resolve(newReview);
-    }, 500);
+  const response = await axios.post(API_URL, review, {
+    headers: getAuthHeader(),
   });
+  return response.data;
 };

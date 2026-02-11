@@ -19,3 +19,8 @@ export const updateOrderStatus = async (orderId, status) => {
   const response = await client.put(`/api/admin/order/${orderId}/${status}`);
   return response.data;
 };
+
+export const getOrderInvoice = async (orderId) => {
+  const response = await client.get(`/api/admin/orders/${orderId}/invoice`);
+  return response.data;
+};

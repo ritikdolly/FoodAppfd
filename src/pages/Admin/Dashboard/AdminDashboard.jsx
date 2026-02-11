@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "../../../api/admin";
+import { getAllCustomerReviews } from "../../../api/customerReview";
 
 export const AdminDashboard = () => {
   const [data, setData] = useState({
@@ -7,7 +8,11 @@ export const AdminDashboard = () => {
     foodItems: 0,
     activeOffers: 0,
     revenue: 0,
+    revenueData: [],
+    recentOrders: [],
   });
+
+  const [customerReviews, setCustomerReviews] = useState([]);
 
   const [period, setPeriod] = useState("all");
 
@@ -20,7 +25,18 @@ export const AdminDashboard = () => {
         console.error("Failed to fetch dashboard stats", error);
       }
     };
+
+    const fetchReviews = async () => {
+      try {
+        const reviews = await getAllCustomerReviews();
+        setCustomerReviews(reviews);
+      } catch (error) {
+        console.error("Failed to fetch customer reviews", error);
+      }
+    };
+
     fetchStats();
+    fetchReviews();
   }, [period]);
 
   const stats = [
@@ -82,15 +98,94 @@ export const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Placeholder for Recent Orders Chart or similar */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-400">
-          Revenue Chart Placeholder
+        {/* Revenue Chart */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">
+            Revenue Trends (Last 7 Days)
+          </h3>
+          <div className="h-64 w-full flex items-end justify-between gap-2">
+            {data.revenueData && data.revenueData.length > 0 ? (
+              data.revenueData.map((item, index) => {
+                const maxVal = Math.max(
+                  ...data.revenueData.map((d) => d.amount),
+                  1,
+                ); // Avoid div/0
+                const height = (item.amount / maxVal) * 100;
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center w-full group relative"
+                  >
+                    <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+                      ₹{item.amount}
+                    </div>
+                    <div
+                      className="w-full bg-[#FF4B2B]/20 rounded-t-sm hover:bg-[#FF4B2B]/40 transition-colors cursor-pointer"
+                      style={{ height: `${height}%`, minHeight: "4px" }}
+                    />
+                    <span className="text-xs text-gray-500 mt-2">
+                      {item.label}
+                    </span>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                No revenue data available
+              </div>
+            )}
+          </div>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-400">
-          Recent Activity Placeholder
+
+        {/* Recent Orders */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">
+            Recent Activity
+          </h3>
+          <div className="space-y-4 overflow-y-auto max-h-64 pr-2">
+            {data.recentOrders && data.recentOrders.length > 0 ? (
+              data.recentOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      Order #{order.id.substring(0, 6)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(order.createdAt).toLocaleDateString()} •{" "}
+                      {order.items.length} Items
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900">
+                      ₹{order.totalAmount}
+                    </p>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        order.status === "COMPLETED" ||
+                        order.status === "DELIVERED"
+                          ? "bg-green-100 text-green-700"
+                          : order.status === "CANCELLED"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                No recent orders
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </div>      
     </div>
   );
 };

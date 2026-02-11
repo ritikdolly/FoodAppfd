@@ -23,6 +23,16 @@ export const AuthProvider = ({ children }) => {
   const getUserFromToken = (token) => {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
+
+      // Check for expiration
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem("jwt");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("user");
+        return null;
+      }
+
       return { email: payload.sub };
     } catch {
       return null;
@@ -38,21 +48,25 @@ export const AuthProvider = ({ children }) => {
 
       if (jwt) {
         const userFromToken = getUserFromToken(jwt);
+
+        // If token is invalid or expired (returns null), stop here
+        if (!userFromToken) {
+          setLoading(false);
+          return;
+        }
+
         setUserRole(role || "ROLE_CUSTOMER");
 
         let baseUser = {
           role: role || "ROLE_CUSTOMER",
           id: userId,
+          ...userFromToken,
         };
-
-        if (userFromToken) {
-          baseUser = { ...baseUser, ...userFromToken };
-        }
 
         // Fetch full profile if we have an ID
         if (userId) {
           try {
-            // Dynamic import to avoid circular dependency if api/user imports client which uses interceptor
+            // Dynamic import to avoid circular dependency
             const { getUser } = await import("../api/user");
             const fullUser = await getUser(userId);
             setCurrentUser({ ...baseUser, ...fullUser });

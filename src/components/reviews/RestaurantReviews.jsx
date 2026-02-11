@@ -13,31 +13,42 @@ export const RestaurantReviews = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const fetchReviews = async () => {
+    try {
+      const data = await getReviews();
+      // Backend returns CustomerReview objects: { id, userName, rating, comment, createdAt, ... }
+      // We map them to match expected ReviewCard props if needed, or update ReviewCard
+      const mappedReviews = data.map((r) => ({
+        ...r,
+        name: r.userName || "Customer", // Map userName to name
+        date: r.createdAt,
+        // Generate a consistent avatar based on name or id if missing
+        avatar:
+          r.avatar ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(r.userName || "Customer")}&background=random`,
+      }));
+      setReviews(mappedReviews);
+    } catch (error) {
+      console.error("Failed to load reviews");
+    }
+  };
+
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const data = await getReviews();
-        // Only show trusted reviews on public page
-        const trusted = data.filter((r) => r.isTrusted);
-        setReviews(trusted);
-      } catch (error) {
-        console.error("Failed to load reviews");
-      }
-    };
     fetchReviews();
   }, []);
 
   const handleAddReview = async (reviewData) => {
     setIsSubmitting(true);
     try {
-      await addReview({
-        ...reviewData,
-        name: currentUser.name || "Customer",
-        userId: currentUser.id,
-      });
+      // API expects { rating, comment }
+      await addReview(reviewData);
+
       setIsModalOpen(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
+
+      // Refresh reviews to show the new one immediately
+      fetchReviews();
     } catch (error) {
       console.error("Failed to submit review", error);
     } finally {
@@ -74,7 +85,7 @@ export const RestaurantReviews = () => {
         <div className="mx-4 mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-800 animate-fade-in">
           <CheckCircle size={20} className="text-green-600" />
           <p className="text-sm font-medium">
-            Thanks for your review! It has been submitted for approval.
+            Thanks for your review! It has been submitted/updated successfully.
           </p>
         </div>
       )}

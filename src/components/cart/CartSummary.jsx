@@ -9,7 +9,7 @@ export const CartSummary = ({ items }) => {
     0,
   );
 
-  const delivery = items.length ? 40 : 0;
+  const delivery = items.length && subtotal < 300 ? 40 : 0;
   const total = subtotal + delivery;
 
   return (
