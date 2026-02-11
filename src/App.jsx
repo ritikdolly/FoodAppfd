@@ -18,8 +18,6 @@ import { ProfilePage } from "./pages/User/ProfilePage";
 import { FavoritesPage } from "./pages/User/FavoritesPage";
 import { AddressPage } from "./pages/User/AddressPage";
 import { OrdersPage } from "./pages/User/OrdersPage";
-import { OrderTrackingPage } from "./pages/User/OrderTrackingPage";
-import { InvoicePage } from "./pages/User/InvoicePage";
 import { HelpPage } from "./pages/User/HelpPage";
 import { SignInModal } from "./components/auth/SignInModal";
 import { SignUpModal } from "./components/auth/SignUpModal";
@@ -36,7 +34,6 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "/menu", element: <MenuPage /> },
       { path: "/product/:id", element: <ProductPage /> },
-      { path: "/invoice/:id", element: <InvoicePage /> },
       { path: "/help", element: <HelpPage /> },
     ],
   },
@@ -56,7 +53,6 @@ const router = createBrowserRouter([
               { path: "favorites", element: <FavoritesPage /> },
               { path: "addresses", element: <AddressPage /> },
               { path: "orders", element: <OrdersPage /> },
-              { path: "order-tracking/:id", element: <OrderTrackingPage /> },
             ],
           },
         ],

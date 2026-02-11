@@ -37,7 +37,7 @@ export const CartSummary = ({ items }) => {
         onClick={() => navigate("/auth/customer/placeOrder")}
         disabled={!items.length}
       >
-        Proceed to Checkout
+        Proceed to Order
       </Button>
     </Card>
   );

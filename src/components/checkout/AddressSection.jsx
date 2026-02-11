@@ -31,8 +31,7 @@ export const AddressSection = ({ onSelect }) => {
 
   const handleSelect = (addr) => {
     setSelectedId(addr.id);
-    const fullAddr = `${addr.street}, ${addr.city}, ${addr.district}, ${addr.state} - ${addr.pin}, ${addr.country}, Phone: ${addr.mobile}`;
-    onSelect(fullAddr);
+    onSelect(addr);
   };
 
   useEffect(() => {
@@ -174,7 +173,6 @@ export const AddressSection = ({ onSelect }) => {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-bold text-gray-900">{addr.type}</span>
-                   
                   </div>
                   <p className="text-sm text-gray-600 line-clamp-1">
                     {addr.street}, {addr.city}, {addr.district}
