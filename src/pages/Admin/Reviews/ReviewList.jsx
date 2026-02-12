@@ -70,7 +70,7 @@ export const ReviewList = () => {
               <th className="px-6 py-4 font-medium">Rating</th>
               <th className="px-6 py-4 font-medium w-1/3">Review</th>
               <th className="px-6 py-4 font-medium">Date</th>
-              <th className="px-6 py-4 font-medium">Status</th>
+              {/* <th className="px-6 py-4 font-medium">Status</th> */}
               <th className="px-6 py-4 font-medium text-right bg-gray-50/50">
                 Actions
               </th>
@@ -117,9 +117,9 @@ export const ReviewList = () => {
                   </p>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                  {review.date}
+                  {new Date(review.createdAt).toLocaleString()}
                 </td>
-                <td className="px-6 py-4">
+                {/* <td className="px-6 py-4">
                   <button
                     onClick={() => handleToggleTrusted(review.id)}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all ${
@@ -135,7 +135,7 @@ export const ReviewList = () => {
                     )}
                     {review.isTrusted ? "Trusted" : "Untrusted"}
                   </button>
-                </td>
+                </td> */}
                 <td className="px-6 py-4 text-right">
                   <button
                     onClick={() => handleDelete(review.id)}
@@ -164,7 +164,9 @@ export const ReviewList = () => {
                 />
                 <div>
                   <h4 className="font-medium text-gray-900">{review.name}</h4>
-                  <span className="text-xs text-gray-500">{review.date}</span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(review.createdAt).toLocaleString()}
+                  </span>
                 </div>
               </div>
               <div className="flex text-orange-400 gap-0.5">
