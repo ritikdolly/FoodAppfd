@@ -13,7 +13,10 @@ const getAuthHeader = () => {
 export const getReviews = async () => {
   try {
     const response = await axios.get(API_URL);
-    return response.data;
+    if (response.data.success) {
+      return response.data.data;
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching reviews", error);
     return [];
@@ -21,10 +24,18 @@ export const getReviews = async () => {
 };
 
 export const deleteReview = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`, {
-    headers: getAuthHeader(),
-  });
-  return response.data;
+  try {
+    const response = await axios.delete(`${API_URL}/${id}`, {
+      headers: getAuthHeader(),
+    });
+    if (response.data.success) {
+      return response.data;
+    } else {
+      throw new Error(response.data.message);
+    }
+  } catch (error) {
+    throw error.response?.data?.message || error.message || "An error occurred";
+  }
 };
 
 // Assuming backend supports toggling trusted or similar logic,
@@ -37,8 +48,16 @@ export const toggleTrusted = async (id) => {
 };
 
 export const addReview = async (review) => {
-  const response = await axios.post(API_URL, review, {
-    headers: getAuthHeader(),
-  });
-  return response.data;
+  try {
+    const response = await axios.post(API_URL, review, {
+      headers: getAuthHeader(),
+    });
+    if (response.data.success) {
+      return response.data;
+    } else {
+      throw new Error(response.data.message);
+    }
+  } catch (error) {
+    throw error.response?.data?.message || error.message || "An error occurred";
+  }
 };

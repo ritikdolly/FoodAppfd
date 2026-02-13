@@ -51,7 +51,7 @@ export const ProfilePage = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      await updateUser(user);
+      await updateUser(user.id, user);
       setIsEditing(false);
       toast.success("Profile updated successfully!");
     } catch (error) {
