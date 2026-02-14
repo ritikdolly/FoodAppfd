@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 import { MainLayout } from "./components/layout/MainLayout/MainLayout";
 import { Home } from "./pages/Home/Home";
@@ -39,6 +40,16 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/checkout",
+    element: <PrivateRoute allowedRoles={["ROLE_CUSTOMER"]} />,
+    children: [
+      {
+        element: <MainLayout />,
+        children: [{ index: true, element: <CheckoutPage /> }],
+      },
+    ],
+  },
+  {
     path: "/auth",
     children: [
       {
@@ -49,7 +60,6 @@ const router = createBrowserRouter([
             element: <MainLayout />,
             children: [
               { path: "cart", element: <CartPage /> },
-              { path: "placeOrder", element: <CheckoutPage /> },
               { path: "profile", element: <ProfilePage /> },
               { path: "favorites", element: <FavoritesPage /> },
               { path: "addresses", element: <AddressPage /> },
@@ -80,8 +90,6 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
-import { Toaster } from "react-hot-toast";
 
 function App() {
   return (

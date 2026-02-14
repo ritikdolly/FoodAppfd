@@ -1,19 +1,39 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { buyNow } from "../../api/foods";
 import { Button } from "../ui/Button"; // Import Button
 import { Card } from "../ui/Card"; // Import Card
 import { Heart } from "lucide-react"; // Import Heart
+import toast from "react-hot-toast";
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
-  // Favorites logic skipped in card for brevity/complexity, or can be added but requires fetching favs for list
-  // For now, simpler to not show heart in list, or just static.
-  // User asked for "add and remove favorite" - usually implies from detailed view OR list.
-  // Let's keep it simple: Heart in Details view is implemented. Heart in List view is bonus but requires fetching user favs for ALL products.
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBuyNow = async () => {
+    if (!currentUser) {
+      toast.error("Please login to continue your purchase.");
+      navigate("/auth/login");
+      return;
+    }
+
+    if (!product.availability) return;
+
+    try {
+      const order = await buyNow({ foodId: product.id, quantity: 1 });
+      navigate(`/checkout?orderId=${order.id}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to process Buy Now");
+    }
+  };
 
   return (
     <Card className="p-0 overflow-hidden group h-full flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/50">
+      {/* ... image link logic ... */}
       {product.id ? (
         <Link
           to={`/product/${product.id}`}
@@ -32,6 +52,7 @@ export const ProductCard = ({ product }) => {
         </Link>
       ) : (
         <div className="block relative overflow-hidden">
+          {/* ... */}
           <img
             src={product.imageUrl}
             alt={product.name}
@@ -45,6 +66,7 @@ export const ProductCard = ({ product }) => {
       )}
 
       <div className="p-5 flex flex-col flex-1 gap-2">
+        {/* ... title and price logic ... */}
         <div className="flex justify-between items-start">
           {product.id ? (
             <Link to={`/product/${product.id}`}>
@@ -57,23 +79,52 @@ export const ProductCard = ({ product }) => {
               {product.name}
             </h3>
           )}
-          <span className="text-xl font-bold text-[#FF4B2B]">
-            ₹{product.price}
-          </span>
+          {product.discountedPrice &&
+          product.discountedPrice < product.price ? (
+            <div className="flex flex-col items-end">
+              <span className="text-xl font-bold text-[#FF4B2B]">
+                ₹{product.discountedPrice}
+              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-bold text-green-600 bg-green-50 px-1 rounded">
+                  {product.offerType === "percentage"
+                    ? `${product.offerValue}% OFF`
+                    : `₹${product.offerValue} OFF`}
+                </span>
+                <span className="text-sm text-gray-400 line-through">
+                  ₹{product.price}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <span className="text-xl font-bold text-[#FF4B2B]">
+              ₹{product.price}
+            </span>
+          )}
         </div>
 
         <p className="text-sm text-gray-500 line-clamp-2">
           {product.comments || product.description || product.quantity}
         </p>
 
-        <div className="mt-auto pt-4 flex items-center justify-between gap-3">
+        <div className="mt-auto pt-2 flex items-center gap-2">
+          {/* Buy Now Button */}
+          <Button
+            onClick={handleBuyNow}
+            className="flex-1 rounded-xl text-sm py-2 bg-[#FF4B2B] text-white hover:bg-[#FF4B2B]/90 shadow-md shadow-orange-200 cursor-pointer"
+            disabled={!product.availability}
+          >
+            Buy Now
+          </Button>
+
+          {/* Add to Cart Button */}
           <Button
             onClick={() => addToCart(product)}
             variant="outline"
-            className="w-full rounded-xl text-sm py-2 hover:bg-[#FF4B2B] hover:text-white border-[#FF4B2B]/20"
+            className="flex-1 rounded-xl text-sm py-2 hover:bg-[#FF4B2B] hover:text-white border-[#FF4B2B]/20 cursor-pointer"
             disabled={!product.availability}
           >
-            {product.availability ? "Add to Cart" : "Out of Stock"}
+            Add to Cart
           </Button>
         </div>
       </div>

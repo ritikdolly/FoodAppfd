@@ -1,4 +1,17 @@
+import { useEffect } from "react";
+
 export const Modal = ({ open, onClose, children, className = "" }) => {
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -11,11 +24,11 @@ export const Modal = ({ open, onClose, children, className = "" }) => {
 
       {/* Modal Box */}
       <div
-        className={`relative bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 z-10 animate-[scale-in_0.2s_ease-out] ${className}`}
+        className={`relative bg-white w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-6 z-10 animate-[scale-in_0.2s_ease-out] scrollbar-hide ${className}`}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-20 bg-white/80 rounded-full p-1 md:bg-transparent"
         >
           ✕
         </button>

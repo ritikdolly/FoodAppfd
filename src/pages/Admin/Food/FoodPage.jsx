@@ -159,12 +159,14 @@ export const FoodPage = () => {
         onDelete={handleDelete}
       />
 
-      <FoodModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onSave={handleSave}
-        initialData={editingFood}
-      />
+      {open && (
+        <FoodModal
+          open={open}
+          onClose={() => setOpen(false)}
+          onSave={handleSave}
+          initialData={editingFood}
+        />
+      )}
     </div>
   );
 };

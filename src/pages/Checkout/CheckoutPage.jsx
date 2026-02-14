@@ -1,27 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 import { AddressSection } from "../../components/checkout/AddressSection";
 import { PaymentSection } from "../../components/checkout/PaymentSection";
 import { Button } from "../../components/ui/Button";
-import { createOrder } from "../../api/orders";
+import {
+  createOrder,
+  getOrderById,
+  confirmOrder,
+  initiatePaymentForOrder,
+} from "../../api/orders";
 import { initiatePayment, verifyPayment } from "../../api/payment";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export const CheckoutPage = () => {
   const { cartItems, clearCart } = useCart();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("orderId");
+
+  const [buyNowOrder, setBuyNowOrder] = useState(null);
 
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [loading, setLoading] = useState(false);
 
-  const cartTotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+  useEffect(() => {
+    if (orderId) {
+      const fetchOrder = async () => {
+        try {
+          const order = await getOrderById(orderId);
+          setBuyNowOrder(order);
+        } catch (error) {
+          console.error("Failed to load order", error);
+          toast.error("Failed to load order details");
+          navigate("/menu");
+        }
+      };
+      fetchOrder();
+    }
+  }, [orderId, navigate]);
+
+  // Determine items and totals based on flow
+  const displayItems = orderId && buyNowOrder ? buyNowOrder.items : cartItems;
+
+  const cartTotal = displayItems.reduce(
+    (sum, item) => sum + (item.totalPrice || item.price * item.quantity),
     0,
   );
-  const deliveryFee = cartItems.length > 0 && cartTotal < 300 ? 40 : 0;
+
+  const deliveryFee =
+    orderId && buyNowOrder
+      ? buyNowOrder.deliveryFee
+      : cartItems.length > 0 && cartTotal < 300
+        ? 40
+        : 0;
   const grandTotal = cartTotal + deliveryFee;
 
   // Temporary function until AddressSection is fixed
@@ -42,22 +76,97 @@ export const CheckoutPage = () => {
           shippingAddress: selectedAddress,
           paymentMethod: "COD",
         };
-        await createOrder(orderRequest);
-        clearCart();
+
+        if (orderId) {
+          await confirmOrder(orderId, orderRequest);
+        } else {
+          await createOrder(orderRequest);
+          clearCart();
+        }
+
         toast.success("Order Placed Successfully!");
         navigate("/auth/customer/orders");
       } else {
         // Online Payment
+        // Initiate payment usually creates an order.
+        // For Buy Now, we might need a different flow or ensure initiatePayment sends orderId?
+        // Current initiatePayment API likely creates a new RZP order based on cart.
+        // We need to check initiatePayment implementation.
+        // Assumption: For now, focus on COD as requested in step 2 (Redirect to checkout).
+        // But Part 3 says "Regression test for checkout & payment flow".
+        // Let's assume standard flow for now.
+
+        if (orderId) {
+          // We need to confirm the order details first (address, payment method)
+          // even if we are going to pay online.
+          // However, confirmOrder returns the Order object, not PaymentResponse.
+          // But wait, confirmOrder sets status to PENDING or PAYMENT_PENDING.
+
+          // If we click "Place Order" with Online Payment:
+          // 1. Confirm the order with address.
+          const orderRequest = {
+            shippingAddress: selectedAddress,
+            paymentMethod: "ONLINE", // Explicitly set for confirmation
+          };
+          await confirmOrder(orderId, orderRequest);
+
+          // 2. Initiate Payment for this order
+          const paymentRes = await initiatePaymentForOrder(orderId);
+
+          // 3. Open Razorpay
+          const options = {
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+            amount: paymentRes.amount,
+            currency: paymentRes.currency,
+            name: "Prajapati Line Hotel",
+            description: "Order Payment",
+            order_id: paymentRes.payment_url,
+            handler: async function (response) {
+              try {
+                const verifyReq = {
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature,
+                  shippingAddress: selectedAddress,
+                };
+                await verifyPayment(verifyReq);
+                // clearCart(); // Do NOT clear cart for Buy Now
+                toast.success("Payment Successful!");
+                navigate("/auth/customer/orders");
+              } catch (err) {
+                toast.error("Payment Verification Failed");
+                console.error(err);
+              }
+            },
+            prefill: {
+              name: "Customer", // Could fetch from user context
+              email: "user@example.com",
+              contact: selectedAddress.mobile,
+            },
+            theme: {
+              color: "#FF4B2B",
+            },
+          };
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+
+          rzp.on("payment.failed", function (response) {
+            toast.error("Payment Failed: " + response.error.description);
+          });
+          setLoading(false);
+          return; // Exit here, handled RZP open
+        }
+
+        // Cart Flow
         const paymentRes = await initiatePayment();
 
-        // paymentRes contains payment_url (order_id), amount, currency
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           amount: paymentRes.amount,
           currency: paymentRes.currency,
           name: "Prajapati Line Hotel",
           description: "Order Payment",
-          order_id: paymentRes.payment_url,
+          order_id: paymentRes.payment_url, // Assuming backend sends order_id here
           handler: async function (response) {
             try {
               const verifyReq = {
@@ -76,7 +185,7 @@ export const CheckoutPage = () => {
             }
           },
           prefill: {
-            name: "Customer", // We could fetch user name from context if available
+            name: "Customer",
             email: "user@example.com",
             contact: selectedAddress.mobile,
           },
@@ -96,11 +205,11 @@ export const CheckoutPage = () => {
       console.error(error);
       toast.error("Failed to place order");
     } finally {
-      setLoading(false);
+      setLoading(false); // Handled inside above
     }
   };
 
-  if (!cartItems || cartItems.length === 0) {
+  if ((!cartItems || cartItems.length === 0) && !orderId) {
     return (
       <div className="min-h-screen pt-24 pb-12 px-4 flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold text-gray-800">Your cart is empty</h2>
@@ -122,22 +231,24 @@ export const CheckoutPage = () => {
               Review Items
             </h2>
             <div className="divide-y divide-gray-100">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex py-4 gap-4">
+              {displayItems.map((item) => (
+                <div key={item.id || item.foodId} className="flex py-4 gap-4">
                   <img
-                    src={item.imageUrl}
-                    alt={item.name}
+                    src={item.imageUrl || item.foodImage}
+                    alt={item.name || item.foodName}
                     className="w-16 h-16 rounded-lg object-cover"
                   />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                    <h4 className="font-semibold text-gray-800">
+                      {item.name || item.foodName}
+                    </h4>
                     <p className="text-sm text-gray-500">
                       Quantity: {item.quantity}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-800">
-                      ₹{item.price * item.quantity}
+                      ₹{item.totalPrice || item.price * item.quantity}
                     </p>
                     <p className="text-xs text-gray-500">
                       ₹{item.price} / item

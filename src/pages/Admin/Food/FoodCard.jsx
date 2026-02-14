@@ -55,9 +55,27 @@ export const FoodCard = ({ food, onEdit, onDelete }) => {
               )}
             </div>
           </div>
-          <span className="font-bold text-lg text-[#FF4B2B]">
-            ₹{food.price}
-          </span>
+          <div className="text-right">
+            {food.discountedPrice && food.discountedPrice < food.price ? (
+              <>
+                <span className="block font-bold text-lg text-green-600">
+                  ₹{food.discountedPrice}
+                </span>
+                <span className="block text-xs text-gray-400 line-through">
+                  ₹{food.price}
+                </span>
+                <span className="block text-[10px] font-bold text-[#FF4B2B] bg-red-50 px-1 rounded mt-1">
+                  {food.offerType === "percentage"
+                    ? `${food.offerValue}% OFF`
+                    : `₹${food.offerValue} OFF`}
+                </span>
+              </>
+            ) : (
+              <span className="font-bold text-lg text-[#FF4B2B]">
+                ₹{food.price}
+              </span>
+            )}
+          </div>
         </div>
 
         <p className="text-gray-500 text-sm line-clamp-2 min-h-[40px] mb-2">
