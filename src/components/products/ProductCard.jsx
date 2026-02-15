@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import { buyNow } from "../../api/foods";
 import { Button } from "../ui/Button"; // Import Button
 import { Card } from "../ui/Card"; // Import Card
 import { Heart } from "lucide-react"; // Import Heart
@@ -13,22 +12,31 @@ export const ProductCard = ({ product }) => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     if (!currentUser) {
       toast.error("Please login to continue your purchase.");
       navigate("/auth/login");
       return;
     }
 
-    if (!product.availability) return;
-
-    try {
-      const order = await buyNow({ foodId: product.id, quantity: 1 });
-      navigate(`/checkout?orderId=${order.id}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to process Buy Now");
+    if (!product.availability) {
+      toast.error("This product is currently unavailable");
+      return;
     }
+
+    // Redirect to checkout with buy-now item details via router state
+    navigate("/checkout", {
+      state: {
+        buyNowItem: {
+          foodId: product.id,
+          quantity: 1,
+          // Include display info for UI
+          name: product.name,
+          price: product.discountedPrice || product.price,
+          imageUrl: product.imageUrl,
+        },
+      },
+    });
   };
 
   return (

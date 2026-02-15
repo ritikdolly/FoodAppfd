@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import { buyNow } from "../../api/foods";
 import { Heart } from "lucide-react";
 import { addFavorite, removeFavorite, getFavorites } from "../../api/user";
 import { USER_ID } from "../../constants";
@@ -14,22 +13,31 @@ export const ProductInfo = ({ product }) => {
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     if (!currentUser) {
       toast.error("Please login to continue your purchase.");
       navigate("/auth/login");
       return;
     }
 
-    if (!product.availability) return;
-
-    try {
-      const order = await buyNow({ foodId: product.id, quantity: 1 });
-      navigate(`/checkout?orderId=${order.id}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to process Buy Now");
+    if (!product.availability) {
+      toast.error("This product is currently unavailable");
+      return;
     }
+
+    // Redirect to checkout with buy-now item details via router state
+    navigate("/checkout", {
+      state: {
+        buyNowItem: {
+          foodId: product.id,
+          quantity: 1,
+          // Include display info for UI
+          name: product.name,
+          price: product.discountedPrice || product.price,
+          imageUrl: product.imageUrl,
+        },
+      },
+    });
   };
 
   const checkFavorite = useCallback(async () => {
@@ -107,7 +115,6 @@ export const ProductInfo = ({ product }) => {
       </div>
 
       <div className="flex items-center gap-4 mt-6">
-
         <button
           disabled={!product.availability}
           onClick={handleBuyNow}
@@ -123,8 +130,6 @@ export const ProductInfo = ({ product }) => {
         >
           Add to Cart
         </button>
-
-        
       </div>
     </>
   );

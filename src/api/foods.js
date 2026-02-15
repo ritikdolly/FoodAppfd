@@ -82,13 +82,3 @@ export const deleteReview = async (foodId, reviewId) => {
     throw error;
   }
 };
-
-export const buyNow = async (buyNowRequest) => {
-  try {
-    const response = await client.post("/api/order/buy-now", buyNowRequest);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating buy now order:", error);
-    throw error;
-  }
-};

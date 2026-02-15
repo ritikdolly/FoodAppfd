@@ -3,7 +3,6 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import { buyNow } from "../../api/foods";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -13,22 +12,31 @@ export const FoodVerticalCard = ({ product }) => {
   const navigate = useNavigate();
   const isInCart = cartItems.some((item) => item.id === product.id);
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     if (!currentUser) {
       toast.error("Please login to continue your purchase.");
       navigate("/auth/login");
       return;
     }
 
-    if (!product.availability) return;
-
-    try {
-      const order = await buyNow({ foodId: product.id, quantity: 1 });
-      navigate(`/checkout?orderId=${order.id}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to process Buy Now");
+    if (!product.availability) {
+      toast.error("This product is currently unavailable");
+      return;
     }
+
+    // Redirect to checkout with buy-now item details via router state
+    navigate("/checkout", {
+      state: {
+        buyNowItem: {
+          foodId: product.id,
+          quantity: 1,
+          // Include display info for UI
+          name: product.name,
+          price: product.discountedPrice || product.price,
+          imageUrl: product.imageUrl,
+        },
+      },
+    });
   };
 
   return (
@@ -102,7 +110,11 @@ export const FoodVerticalCard = ({ product }) => {
               disabled={!product.availability || isInCart}
               title={isInCart ? "Already in Cart" : "Add to Cart"}
             >
-              <Plus size={18} strokeWidth={3} className="text-white cursor-pointer" />
+              <Plus
+                size={18}
+                strokeWidth={3}
+                className="text-white cursor-pointer"
+              />
             </Button>
           </div>
         </div>
