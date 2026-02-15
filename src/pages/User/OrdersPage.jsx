@@ -121,6 +121,47 @@ export const OrdersPage = () => {
                 ))}
               </div>
 
+              {/* Delivery Man Information */}
+              {(order.status === "OUT_FOR_DELIVERY" ||
+                order.status === "DELIVERED") &&
+                order.deliveryManName && (
+                  <div className="border-t border-gray-100 mt-4 pt-4">
+                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                        <Package className="w-4 h-4" />
+                        Delivery Information
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-xs text-blue-700 font-medium">
+                            Delivery Person
+                          </p>
+                          <p className="text-sm font-semibold text-blue-900">
+                            {order.deliveryManName}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-blue-700 font-medium">
+                            Contact Number
+                          </p>
+                          <p className="text-sm font-semibold text-blue-900">
+                            {order.deliveryManMobile}
+                          </p>
+                        </div>
+                      </div>
+                      {order.status === "DELIVERED" && order.deliveredAt && (
+                        <p className="text-xs text-green-700 font-medium mt-3">
+                          ✓ Delivered on{" "}
+                          {format(
+                            new Date(order.deliveredAt),
+                            "MMM d, yyyy 'at' h:mm a",
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
               <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-gray-300" />

@@ -13,6 +13,9 @@ export const MainLayout = () => {
     if (!loading && userRole === "ROLE_ADMIN") {
       navigate("/auth/admin");
     }
+    if (!loading && userRole === "ROLE_DELIVERY") {
+      navigate("/auth/delivery");
+    }
   }, [userRole, loading, navigate]);
 
   useEffect(() => {

@@ -13,6 +13,8 @@ import { ReviewList } from "./pages/Admin/Reviews/ReviewList";
 import { OrderList } from "./pages/Admin/Orders/OrderList";
 import { OffersPage } from "./pages/Admin/Offers/OffersPage";
 import { FoodPage } from "./pages/Admin/Food/FoodPage";
+import { DeliveryMenManagement } from "./pages/Admin/DeliveryMenManagement";
+import { OrderAssignment } from "./pages/Admin/OrderAssignment";
 import { AdminLayout } from "./components/layout/AdminLayout/AdminLayout";
 import { AdminDashboard } from "./pages/Admin/Dashboard/AdminDashboard";
 import { Invoice } from "./components/admin/Invoice";
@@ -21,8 +23,6 @@ import { FavoritesPage } from "./pages/User/FavoritesPage";
 import { AddressPage } from "./pages/User/AddressPage";
 import { OrdersPage } from "./pages/User/OrdersPage";
 import { HelpPage } from "./pages/User/HelpPage";
-import { SignInModal } from "./components/auth/SignInModal";
-import { SignUpModal } from "./components/auth/SignUpModal";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const router = createBrowserRouter([
@@ -83,6 +83,8 @@ const router = createBrowserRouter([
               { path: "food", element: <FoodPage /> },
               { path: "offers", element: <OffersPage /> },
               { path: "reviews", element: <ReviewList /> },
+              { path: "delivery-men", element: <DeliveryMenManagement /> },
+              { path: "order-assignment", element: <OrderAssignment /> },
             ],
           },
         ],

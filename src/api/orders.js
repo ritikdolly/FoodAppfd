@@ -42,3 +42,25 @@ export const initiatePaymentForOrder = async (orderId) => {
   const response = await client.post(`/api/payment/initiate/${orderId}`);
   return response.data;
 };
+
+// Delivery Management Functions
+
+// Assign delivery man to an order (Admin only)
+export const assignDeliveryMan = async (orderId, deliveryManId) => {
+  const response = await client.put(`/api/admin/order/${orderId}/assign`, {
+    deliveryManId,
+  });
+  return response.data;
+};
+
+// Get all orders assigned to delivery man (Delivery Personnel)
+export const getDeliveryManOrders = async () => {
+  const response = await client.get("/api/delivery/orders");
+  return response.data;
+};
+
+// Mark order as delivered (Delivery Personnel)
+export const markAsDelivered = async (orderId) => {
+  const response = await client.put(`/api/delivery/orders/${orderId}/deliver`);
+  return response.data;
+};

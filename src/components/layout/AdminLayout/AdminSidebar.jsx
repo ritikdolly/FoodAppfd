@@ -6,6 +6,8 @@ import {
   Tag,
   X,
   MessageSquare,
+  Truck,
+  UserCheck,
 } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
@@ -97,6 +99,24 @@ export const AdminSidebar = ({ open, onClose }) => {
           >
             <MessageSquare className="w-5 h-5" />
             Reviews
+          </NavLink>
+
+          <NavLink
+            to="/auth/admin/delivery-men"
+            className={linkClass}
+            onClick={() => onClose()}
+          >
+            <Truck className="w-5 h-5" />
+            Delivery Personnel
+          </NavLink>
+
+          <NavLink
+            to="/auth/admin/order-assignment"
+            className={linkClass}
+            onClick={() => onClose()}
+          >
+            <UserCheck className="w-5 h-5" />
+            Order Assignment
           </NavLink>
         </nav>
 
