@@ -1,4 +1,11 @@
-import { UtensilsCrossed, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import {
+  UtensilsCrossed,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
+import { WEBSITE_NAME } from "../../constants";
 
 export const FooterBrand = () => {
   return (
@@ -7,13 +14,12 @@ export const FooterBrand = () => {
         <div className="bg-orange-600 p-2 rounded-lg">
           <UtensilsCrossed className="w-6 h-6 text-white" />
         </div>
-        <span className="text-2xl font-bold text-white">
-          Prajapati Line Hotel
-        </span>
+        <span className="text-2xl font-bold text-white">{WEBSITE_NAME}</span>
       </div>
 
       <p className="text-sm leading-relaxed text-gray-400">
-        Satisfying your cravings, one delivery at a time. Fresh food from top local restaurants, straight to your door.
+        Satisfying your cravings, one delivery at a time. Fresh food from top
+        local restaurants, straight to your door.
       </p>
 
       <div className="flex items-center gap-4">

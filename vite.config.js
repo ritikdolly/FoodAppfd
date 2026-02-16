@@ -23,6 +23,9 @@ export default defineConfig({
     setupFiles: "./src/test/setup.js",
   },
   optimizeDeps: {
-    include: ["react-hot-toast"], // Force optimization
+    include: ["sockjs-client", "stompjs"],
+  },
+  define: {
+    global: "window",
   },
 });

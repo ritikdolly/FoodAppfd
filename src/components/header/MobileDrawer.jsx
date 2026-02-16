@@ -100,7 +100,7 @@ export const MobileDrawer = ({
                 <div className="space-y-1">
                   <button
                     onClick={() => {
-                      navigate("/profile");
+                      navigate("/auth/customer/profile");
                       onClose();
                     }}
                     className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
@@ -109,14 +109,14 @@ export const MobileDrawer = ({
                   </button>
                   <button
                     onClick={() => {
-                      navigate("/orders");
+                      navigate("/auth/customer/orders");
                       onClose();
                     }}
                     className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
                   >
                     <ShoppingBag className="w-5 h-5 text-gray-400" /> My Orders
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => {
                       navigate("/favorites");
                       onClose();
@@ -124,8 +124,8 @@ export const MobileDrawer = ({
                     className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
                   >
                     <Heart className="w-5 h-5 text-gray-400" /> Favorites
-                  </button>
-                  <button
+                  </button> */}
+                  {/* <button
                     onClick={() => {
                       navigate("/addresses");
                       onClose();
@@ -133,7 +133,7 @@ export const MobileDrawer = ({
                     className="w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg text-left"
                   >
                     <MapPin className="w-5 h-5 text-gray-400" /> Saved Addresses
-                  </button>
+                  </button> */}
                 </div>
 
                 <button

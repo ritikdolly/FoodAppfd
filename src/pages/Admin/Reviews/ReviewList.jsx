@@ -9,7 +9,14 @@ export const ReviewList = () => {
   const loadReviews = async () => {
     try {
       const data = await getReviews();
-      setReviews(Array.isArray(data) ? data : []);
+      const mappedReviews = (Array.isArray(data) ? data : []).map((r) => ({
+        ...r,
+        name: r.userName || "Customer",
+        avatar:
+          r.avatar ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(r.userName || "Customer")}&background=random`,
+      }));
+      setReviews(mappedReviews);
     } catch (error) {
       console.error("Failed to load reviews", error);
     } finally {

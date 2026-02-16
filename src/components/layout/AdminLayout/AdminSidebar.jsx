@@ -15,6 +15,8 @@ import { useAuth } from "../../../context/AuthContext";
 export const AdminSidebar = ({ open, onClose }) => {
   const { currentUser } = useAuth();
 
+  
+
   const linkClass = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium mb-1 ${
       isActive
@@ -42,7 +44,7 @@ export const AdminSidebar = ({ open, onClose }) => {
         `}
       >
         <div className="p-6 flex justify-between items-center">
-          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-[#FF4B2B] to-[#FF416C]">
+          <h1  className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-[#FF4B2B] to-[#FF416C]">
             Admin Panel
           </h1>
           {/* Close Button (Mobile Only) */}
@@ -83,14 +85,14 @@ export const AdminSidebar = ({ open, onClose }) => {
             Orders
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/auth/admin/offers"
             className={linkClass}
             onClick={() => onClose()}
           >
             <Tag className="w-5 h-5" />
             Offers
-          </NavLink>
+          </NavLink> */}
 
           <NavLink
             to="/auth/admin/reviews"
@@ -107,7 +109,7 @@ export const AdminSidebar = ({ open, onClose }) => {
             onClick={() => onClose()}
           >
             <Truck className="w-5 h-5" />
-            Delivery Personnel
+            Delivery Person
           </NavLink>
 
           <NavLink

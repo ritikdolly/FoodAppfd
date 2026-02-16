@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail } from "lucide-react";
+import { WEBSITE_EMAIL, WEBSITE_FIRST_ADDRESS_LINE, WEBSITE_PHONE, WEBSITE_SECOND_ADDRESS_LINE, WEBSITE_THIRD_ADDRESS_LINE } from "../../constants";
 
 export const FooterContact = () => {
   return (
@@ -8,17 +9,18 @@ export const FooterContact = () => {
         <li className="flex gap-3">
           <MapPin className="w-5 h-5 text-orange-500 shrink-0" />
           <span>
-            Prajapati Line Hotel Tulbul, Main Road Lalpania Dist: Boakro (JH) <br />
-            India, 829111
+            {WEBSITE_FIRST_ADDRESS_LINE} <br />
+            {WEBSITE_SECOND_ADDRESS_LINE} <br />
+            {WEBSITE_THIRD_ADDRESS_LINE}
           </span>
         </li>
         <li className="flex gap-3">
           <Phone className="w-5 h-5 text-orange-500 shrink-0" />
-          <span>+91 9798904589</span>
+          <span>{WEBSITE_PHONE}</span>
         </li>
         <li className="flex gap-3">
           <Mail className="w-5 h-5 text-orange-500 shrink-0" />
-          <span>support@prajapatilinehotel.com</span>
+          <span>{WEBSITE_EMAIL}</span>
         </li>
       </ul>
     </div>

@@ -1,5 +1,6 @@
 import { UtensilsCrossed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { WEBSITE_FIRST_NAME, WEBSITE_SECOND_NAME, WEBSITE_THIRD_NAME, WEBSITE_SHORT_NAME } from "../../constants";
 
 export const Logo = () => {
   const navigate = useNavigate();
@@ -14,10 +15,10 @@ export const Logo = () => {
       </div>
 
       <span className="hidden sm:block text-2xl font-bold text-[#2D3436] tracking-tight hover:text-[#FF4B2B] transition-colors">
-        Prajapati<span className="text-[#FF4B2B]">Line</span>Hotel
+        {WEBSITE_FIRST_NAME}<span className="text-[#FF4B2B]">{WEBSITE_SECOND_NAME}</span>{WEBSITE_THIRD_NAME}
       </span>
 
-      <span className="sm:hidden text-xl font-bold text-[#FF4B2B]">PLH</span>
+      <span className="sm:hidden text-xl font-bold text-[#FF4B2B]">{WEBSITE_SHORT_NAME}</span>
     </div>
   );
 };

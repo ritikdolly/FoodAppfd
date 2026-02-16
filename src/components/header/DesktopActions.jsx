@@ -23,13 +23,13 @@ export const DesktopActions = ({
 
   return (
     <div className="hidden md:flex items-center gap-3 border-l pl-6">
-      {/* Favorites */}
+      {/* Favorites
       <button
         onClick={() => navigate("/auth/customer/favorites")}
         className="p-2 hover:bg-gray-100 rounded-full"
       >
         <Heart className="w-5 h-5" />
-      </button>
+      </button> */}
 
       {/* Cart */}
       <button
