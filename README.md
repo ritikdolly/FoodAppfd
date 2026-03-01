@@ -12,35 +12,11 @@ A modern, responsive restaurant website built with **React**, **Vite**, and **Ta
 - **Razorpay** for payments
 - **Spring Boot** backend (separate repo)
 
-## Getting Started
-
-```bash
-# Install dependencies
-bun install
-
-# Start dev server
-bun dev
-
-# Build for production
-bun run build
-```
-
-## Pages
-
-| Route              | Page               |
-| ------------------ | ------------------ |
-| `/`                | Home               |
-| `/menu`            | Menu               |
-| `/about`           | About              |
-| `/help`            | Help               |
-| `/auth/customer/*` | Customer Dashboard |
-| `/auth/admin/*`    | Admin Panel        |
-
 ## Developer
 
-**Ritik Raj**
+**Ritik Kumar**
 Full Stack Developer
 
-Email: ritik@example.com
-LinkedIn: [linkedin.com/in/ritikraj](https://linkedin.com/in/ritikraj)
-GitHub: [github.com/ritikraj](https://github.com/ritikraj)
+Email: devwithritik200@gmail.com
+LinkedIn: [linkedin.com/in/ritik-kumar](https://www.linkedin.com/in/ritik-kumar-0a2728192/)
+GitHub: [github.com/ritikdolly](https://github.com/ritikdolly)
