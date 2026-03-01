@@ -13,22 +13,25 @@ import { SignUpModal } from "../components/auth/SignUpModal";
 
 export const Header = () => {
   const { cartItems } = useCart();
-  const { currentUser, logout } = useAuth();
+  const {
+    currentUser,
+    logout,
+    showSignIn,
+    showSignUp,
+    openSignIn,
+    openSignUp,
+    closeAuthModals,
+  } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
-
   // Derived Auth State
   const isLoggedIn = !!currentUser;
-  const isAdmin = currentUser?.role === "ROLE_ADMIN"; // Assuming role is stored here
+  const isAdmin = currentUser?.role === "ROLE_ADMIN";
   const user = currentUser;
 
   const handleLogin = () => {
-    // Auth state handled by context, just close modals
-    setShowSignIn(false);
-    setShowSignUp(false);
+    closeAuthModals();
   };
 
   const handleLogout = async () => {
@@ -72,8 +75,8 @@ export const Header = () => {
               isLoggedIn={isLoggedIn}
               isAdmin={isAdmin}
               user={user}
-              onLogin={() => setShowSignIn(true)}
-              onSignup={() => setShowSignUp(true)}
+              onLogin={openSignIn}
+              onSignup={openSignUp}
               onLogout={handleLogout}
             />
 
@@ -81,7 +84,7 @@ export const Header = () => {
               cartCount={cartItems.length}
               onOpen={() => setDrawerOpen(true)}
               isLoggedIn={isLoggedIn}
-              onLogin={() => setShowSignIn(true)}
+              onLogin={openSignIn}
             />
           </div>
         </div>
@@ -97,7 +100,7 @@ export const Header = () => {
         user={user}
         onLogin={() => {
           setDrawerOpen(false);
-          setShowSignIn(true);
+          openSignIn();
         }}
         onLogout={() => {
           setDrawerOpen(false);
@@ -108,21 +111,15 @@ export const Header = () => {
       {/* AUTH MODALS */}
       <SignInModal
         open={showSignIn}
-        onClose={() => setShowSignIn(false)}
-        onSwitch={() => {
-          setShowSignIn(false);
-          setShowSignUp(true);
-        }}
+        onClose={closeAuthModals}
+        onSwitch={openSignUp}
         onLogin={handleLogin}
       />
 
       <SignUpModal
         open={showSignUp}
-        onClose={() => setShowSignUp(false)}
-        onSwitch={() => {
-          setShowSignUp(false);
-          setShowSignIn(true);
-        }}
+        onClose={closeAuthModals}
+        onSwitch={openSignIn}
         onLogin={handleLogin}
       />
     </>

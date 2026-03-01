@@ -25,3 +25,4 @@ dist-ssr
 .env
 .env.*
 src/config/firebase.js
+src/App.jsx

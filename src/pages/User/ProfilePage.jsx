@@ -86,18 +86,18 @@ export const ProfilePage = () => {
           </div>
 
           <h2 className="text-xl font-bold mb-1 text-center">{user.name}</h2>
-          <p className="text-gray-500 text-sm mb-4 capitalize">
+          {/* <p className="text-gray-500 text-sm mb-4 capitalize">
             {currentUser?.role?.replace("ROLE_", "").toLowerCase()}
-          </p>
+          </p> */}
 
-          <div className="w-full space-y-2 mt-4">
+          {/* <div className="w-full space-y-2 mt-4">
             <div className="flex justify-between text-sm py-2 border-b">
               <span className="text-gray-500">Favorites</span>
               <span className="font-bold">
                 {user.favorites ? user.favorites.length : 0}
               </span>
             </div>
-          </div>
+          </div> */}
         </Card>
 
         {/* Details Form */}

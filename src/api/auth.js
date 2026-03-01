@@ -59,3 +59,37 @@ export const verifyEmail = async (email, otp) => {
     throw error.response?.data || error.message;
   }
 };
+
+export const loginWithGoogle = async (googleToken) => {
+  try {
+    const response = await client.post("/auth/google", { googleToken });
+    return response.data;
+  } catch (error) {
+    console.error("Google Login API error:", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const forgotPassword = async (email) => {
+  try {
+    const response = await client.post("/auth/forgot-password", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Forgot Password API error:", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const resetPassword = async (email, otp, newPassword) => {
+  try {
+    const response = await client.post("/auth/reset-password", {
+      email,
+      otp,
+      newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Reset Password API error:", error);
+    throw error.response?.data || error.message;
+  }
+};

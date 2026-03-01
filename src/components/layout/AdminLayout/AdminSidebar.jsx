@@ -8,14 +8,13 @@ import {
   MessageSquare,
   Truck,
   UserCheck,
+  Users,
 } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
 
 export const AdminSidebar = ({ open, onClose }) => {
   const { currentUser } = useAuth();
-
-  
 
   const linkClass = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium mb-1 ${
@@ -44,7 +43,7 @@ export const AdminSidebar = ({ open, onClose }) => {
         `}
       >
         <div className="p-6 flex justify-between items-center">
-          <h1  className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-[#FF4B2B] to-[#FF416C]">
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-[#FF4B2B] to-[#FF416C]">
             Admin Panel
           </h1>
           {/* Close Button (Mobile Only) */}
@@ -119,6 +118,15 @@ export const AdminSidebar = ({ open, onClose }) => {
           >
             <UserCheck className="w-5 h-5" />
             Order Assignment
+          </NavLink>
+
+          <NavLink
+            to="/auth/admin/users"
+            className={linkClass}
+            onClick={() => onClose()}
+          >
+            <Users className="w-5 h-5" />
+            User Management
           </NavLink>
         </nav>
 

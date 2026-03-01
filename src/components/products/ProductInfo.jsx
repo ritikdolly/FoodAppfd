@@ -9,14 +9,14 @@ import toast from "react-hot-toast";
 
 export const ProductInfo = ({ product }) => {
   const { addToCart } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, openSignIn } = useAuth();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
 
   const handleBuyNow = () => {
     if (!currentUser) {
       toast.error("Please login to continue your purchase.");
-      navigate("/auth/login");
+      openSignIn();
       return;
     }
 

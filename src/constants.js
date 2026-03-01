@@ -10,5 +10,5 @@ export const WEBSITE_URL = "https://plh.com";
 export const WEBSITE_EMAIL = "prajapatilinehoteltulbul@gmail.com";
 export const WEBSITE_PHONE = "+91-9798904589";
 export const WEBSITE_FIRST_ADDRESS_LINE = "Prajapati Line Hotel Tulbul,";
-export const WEBSITE_SECOND_ADDRESS_LINE ="Main Road Lalpania Dist: Boakro (JH)";
-export const WEBSITE_THIRD_ADDRESS_LINE = "India, 829111";
+export const WEBSITE_SECOND_ADDRESS_LINE ="Main Road Lalpania Dist: Bokaro";
+export const WEBSITE_THIRD_ADDRESS_LINE = "Jharkhand, India, 829111";

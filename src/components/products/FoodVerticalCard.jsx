@@ -8,14 +8,14 @@ import toast from "react-hot-toast";
 
 export const FoodVerticalCard = ({ product }) => {
   const { addToCart, cartItems } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, openSignIn } = useAuth();
   const navigate = useNavigate();
   const isInCart = cartItems.some((item) => item.id === product.id);
 
   const handleBuyNow = () => {
     if (!currentUser) {
       toast.error("Please login to continue your purchase.");
-      navigate("/auth/login");
+      openSignIn();
       return;
     }
 

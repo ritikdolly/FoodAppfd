@@ -7,6 +7,9 @@ import {
   sendLoginOtp as apiSendLoginOtp,
   loginWithOtp as apiLoginWithOtp,
   verifyEmail as apiVerifyEmail,
+  loginWithGoogle as apiLoginWithGoogle,
+  forgotPassword as apiForgotPassword,
+  resetPassword as apiResetPassword,
 } from "../api/auth";
 
 const AuthContext = createContext();
@@ -19,6 +22,23 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Auth modal state (shared across all components)
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
+
+  const openSignIn = () => {
+    setShowSignUp(false);
+    setShowSignIn(true);
+  };
+  const openSignUp = () => {
+    setShowSignIn(false);
+    setShowSignUp(true);
+  };
+  const closeAuthModals = () => {
+    setShowSignIn(false);
+    setShowSignUp(false);
+  };
 
   const getUserFromToken = (token) => {
     try {
@@ -114,6 +134,20 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const loginWithGoogle = async (googleToken) => {
+    const data = await apiLoginWithGoogle(googleToken);
+    handleAuthSuccess(data);
+    return data;
+  };
+
+  const forgotPassword = async (email) => {
+    return await apiForgotPassword(email);
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    return await apiResetPassword(email, otp, newPassword);
+  };
+
   const handleAuthSuccess = async (data) => {
     if (data.jwt) {
       localStorage.setItem("jwt", data.jwt);
@@ -166,8 +200,16 @@ export const AuthProvider = ({ children }) => {
     verifyEmail,
     sendLoginOtp,
     loginWithOtp,
+    loginWithGoogle,
+    forgotPassword,
+    resetPassword,
     logout,
     loading,
+    showSignIn,
+    showSignUp,
+    openSignIn,
+    openSignUp,
+    closeAuthModals,
   };
 
   return (

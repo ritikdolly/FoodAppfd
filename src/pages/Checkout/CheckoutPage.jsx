@@ -115,7 +115,7 @@ export const CheckoutPage = () => {
           },
           prefill: {
             name: "Customer",
-            email: "user@example.com",
+            email: "[EMAIL_ADDRESS]",
             contact: selectedAddress.mobile,
           },
           theme: {
